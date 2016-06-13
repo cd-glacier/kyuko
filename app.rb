@@ -1,6 +1,7 @@
 require "nokogiri"
 require "open-uri"
 require "kconv"
+require "./pass.rb"
 
 class NoLectures
 
@@ -9,12 +10,12 @@ class NoLectures
   #1 => imadegawa, 2 => tanabe
   @@place = 0
   @@url = ""
-  @@mon = Array.new(7, nil)
-  @@tue = []
-  @@wed = []
-  @@thu = []
-  @@fri = []
-  @@sat = []
+  @@mon = Array.new(8, nil)
+  @@tue = Array.new(8, nil)
+  @@wed = Array.new(8, nil)
+  @@thu = Array.new(8, nil)
+  @@fri = Array.new(8, nil)
+  @@sat = Array.new(8, nil)
   #@@no_lec = {:mon => @@mon, :tue => @@tue, :wed => @@wed, :thu => @@thu, :fri => @@fri, :sat => @@sat}
   @@no_lec = [nil, @@mon, @@tue, @@wed, @@thu, @@fri, @@sat]
 
@@ -34,7 +35,7 @@ class NoLectures
   end
 
   def change_youbi_int(arg)
-    i_to_youbi = {1 => "mon", 2 => "tue", 3 => "wed", 4 => "thu", 5 => "fri", 6 => "sat"}
+    i_to_youbi = {1 => "月", 2 => "火", 3 => "水", 4 => "木", 5 => "金", 6 => "土"}
     youbi_to_i = {"mon" => 1, "tue" => 2, "wed" => 3, "thu" => 4, "fri" => 5, "sat" => 6}
     if arg.kind_of?(Integer) then
       return i_to_youbi[arg]
@@ -62,11 +63,11 @@ class NoLectures
   def crawl_today()
     charset = open(@@url).charset
     nangen = 0
-    array = []
 
     doc = Nokogiri::HTML.parse(open(@@url), nil, charset)
     subjects = doc.css('.style1').each do |node|
       if node.children.inner_text.include?("講時") then
+        @array = []
         nangen = node.children.css('th').inner_text.delete("講時").to_i
 
         sub_name = xml_to_text(node.children.css("td").to_s.split("\n")[0]) 
@@ -75,7 +76,7 @@ class NoLectures
         reason = xml_to_text(node.children.css("td").to_s.split("\n")[2])
         reason = reason.split("&")[0]
 
-        array << {:sub_name => sub_name.toutf8, :lecturer => lecturer.toutf8, :reason => reason.toutf8}
+        @array << {:sub_name => sub_name.toutf8, :lecturer => lecturer.toutf8, :reason => reason.toutf8}
 
       else
         sub_name = xml_to_text(node.children.css("td").to_s.split("\n")[0]) 
@@ -84,10 +85,10 @@ class NoLectures
         reason = xml_to_text(node.children.css("td").to_s.split("\n")[2])
         reason = reason.split("&")[0]
 
-        array << {:sub_name => sub_name.toutf8, :lecturer => lecturer.toutf8, :reason => reason.toutf8}
+        @array << {:sub_name => sub_name.toutf8, :lecturer => lecturer.toutf8, :reason => reason.toutf8}
       end
+      @@no_lec[@@today][nangen] = @array
     end
-    @@no_lec[@@today][nangen] = array
   end
 
   def crawl_week()
@@ -98,8 +99,4 @@ class NoLectures
   end
 
 end
-
-
-
-
 
