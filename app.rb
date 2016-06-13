@@ -1,7 +1,8 @@
+# encoding: utf-8
 require "nokogiri"
 require "open-uri"
 require "kconv"
-require "./pass.rb"
+require "/projects/kyuko/pass.rb"
 
 class NoLectures
 
@@ -30,13 +31,18 @@ class NoLectures
     @@url = "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=#{today}&kouchi=#{place}"
   end
 
+	def set_today(youbi)
+		@@today = youbi
+    @@url = "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=#{@@today}&kouchi=#{@@place}"
+	end
+
   def show_nolec()
     return @@no_lec
   end
 
   def change_youbi_int(arg)
     i_to_youbi = {1 => "月", 2 => "火", 3 => "水", 4 => "木", 5 => "金", 6 => "土"}
-    youbi_to_i = {"mon" => 1, "tue" => 2, "wed" => 3, "thu" => 4, "fri" => 5, "sat" => 6}
+    youbi_to_i = {"Mon" => 1, "Tue" => 2, "Wed" => 3, "Thu" => 4, "Fri" => 5, "Sat" => 6}
     if arg.kind_of?(Integer) then
       return i_to_youbi[arg]
     elsif arg.kind_of?(String)
