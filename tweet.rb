@@ -10,11 +10,6 @@ client = Twitter::REST::Client.new(
   access_token_secret: ACCESS_TOKEN_SECRET,
 )
 
-def limit_140(arg)
-  return arg.scan(/.{1,137}/m)[0]
-end
-
-
 include Clockwork
 
 every(1.hour, "work") do
@@ -25,6 +20,7 @@ every(1.hour, "work") do
   youbi_name = nolec.change_youbi_int(youbi)        
   nolec = nolec.show_nolec
 
+  contents = []
   content = "#{youbi_name}曜日の休講情報\n" 
 
   i = 0
@@ -39,14 +35,21 @@ every(1.hour, "work") do
 
           content << "#{nangen}限目:#{sub_name} 講師(#{lecturer})\n"
 
+          unless content[100].nil? then
+            contents << content
+            content = "#{youbi_name}曜日の休講情報\n" 
+          end
         end
       end
     end
     i = i + 1
   end
-  content = limit_140(content)
-  content << "..."
-  client.update(content)  
+  contents << content
+  
+  contents.each do |content|
+    #puts content
+    client.update(content) 
+  end
 end
 
 
