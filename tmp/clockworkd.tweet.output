@@ -1,0 +1,3 @@
+I, [2016-06-14T02:51:09.254715 #15009]  INFO -- : Starting clock for 1 events: [ work ]
+I, [2016-06-14T02:51:09.254847 #15009]  INFO -- : Triggering 'work'
+end

@@ -66,6 +66,3 @@ DEPENDENCIES
   daemons (~> 1.2, >= 1.2.3)
   nokogiri
   twitter
-
-BUNDLED WITH
-   1.12.3
