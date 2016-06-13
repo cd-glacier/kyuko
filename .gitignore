@@ -1,0 +1,8 @@
+.DS_Store
+node_modules
+*.swp
+._*
+*.log
+*.pid
+
+
