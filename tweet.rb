@@ -42,11 +42,14 @@ class Tweet
     youbi_name = @@nolec.change_youbi_int(@@youbi)        
     nolec = @@nolec.show_nolec
 
-    content = "#{youbi_name}曜日の休講情報\n#{@@date.strftime("%H時%M分")}時点\n" 
+    p nolec
 
+    content = "#{youbi_name}曜日の休講情報\n#{@@date.strftime("%H時%M分")}時点\n" 
+    
     i = 0
+    nil_counter = 0
     nolec[@@youbi].each do |ttable|
-      unless i == 0 then 
+      unless i == 0 then
         unless ttable.nil? then
           ttable.each do |sub_info|
             nangen = i
@@ -62,12 +65,17 @@ class Tweet
             end
           end
         else
-          #content = "#{youbi_name}曜日の休講はありません"
+          nil_counter = nil_counter + 1
         end
       end
       i = i + 1
     end
-    @@contents << content
+ 
+    if nil_counter == 7 then
+      content = "#{youbi_name}曜日の休講はありません"
+    end
+    
+   @@contents << content
   end
 
   def update_tweet()
