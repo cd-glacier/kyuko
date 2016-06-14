@@ -1,10 +1,11 @@
 # encoding: utf-8
-#require "/projects/kyuko/pass.rb"
-require "./pass.rb"
+require "/projects/kyuko/pass.rb"
+#require "./pass.rb"
 require "twitter"
 require "clockwork"
 require "date"
-require "./app.rb"
+require "/projects/kyuko/app.rb"
+#require "./app.rb"
 
 class Tweet 
   @@consumer_key = ""
@@ -41,8 +42,6 @@ class Tweet
     @@nolec.crawl_today()
     youbi_name = @@nolec.change_youbi_int(@@youbi)        
     nolec = @@nolec.show_nolec
-
-    p nolec
 
     content = "#{youbi_name}曜日の休講情報\n#{@@date.strftime("%H時%M分")}時点\n" 
     
@@ -81,7 +80,7 @@ class Tweet
   def update_tweet()
     @@contents.each do |content|
       puts content
-      #client.update(content) 
+      @@client.update(content) 
     end
   end
 
