@@ -29,25 +29,30 @@ class Tweet
     @@nolec = NoLectures.new(@@youbi, place)   
     @@nolec.set_today(@@youbi)     
   end
-
+ 
+  def set_time()
+     @@date = DateTime.now
+	end
+  
   def set_tomorrow()
     #今何時か調べて、21よりあとなら明日の情報	
+		set_time()
     hour = @@date.strftime("%H").to_i
     if hour >= 21 then
-      @@nolec.tomorrow()
+      @@nolec.tomorrow(@@nolec.show_today)
     end
   end
 
   def create_contents()
     @@nolec.crawl_today()
-    youbi_name = @@nolec.change_youbi_int(@@youbi)        
+    youbi_name = @@nolec.change_youbi_int(@@nolec.show_today)        
     nolec = @@nolec.show_nolec
 
     content = "#{youbi_name}曜日の休講情報\n#{@@date.strftime("%H時%M分")}時点\n" 
     
     i = 0
     nil_counter = 0
-    nolec[@@youbi].each do |ttable|
+    nolec[@@nolec.show_today].each do |ttable|
       unless i == 0 then
         unless ttable.nil? then
           ttable.each do |sub_info|
@@ -90,7 +95,7 @@ end
 
 include Clockwork
 
-every(2.hours, "work") do
+every(1.minute, "work") do
 
   #今日の曜日をset	
   tw_tanabe = Tweet.new(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET, 2)
