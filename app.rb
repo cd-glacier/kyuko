@@ -41,6 +41,10 @@ class NoLectures
     return @@no_lec
   end
 
+  def show_today()
+     return @@today
+	end
+
   def change_youbi_int(arg)
     i_to_youbi = {1 => "月", 2 => "火", 3 => "水", 4 => "木", 5 => "金", 6 => "土"}
     youbi_to_i = {"Mon" => 1, "Tue" => 2, "Wed" => 3, "Thu" => 4, "Fri" => 5, "Sat" => 6}
