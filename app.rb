@@ -2,8 +2,8 @@
 require "nokogiri"
 require "open-uri"
 require "kconv"
-#require "/projects/kyuko/pass.rb"
-require "./pass.rb"
+require "/projects/kyuko/pass.rb"
+#require "./pass.rb"
 
 class NoLectures
 
