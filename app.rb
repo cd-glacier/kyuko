@@ -7,42 +7,38 @@ require "/projects/kyuko/pass.rb"
 
 class NoLectures
 
-  #1 => mon, 2 => tue,,,
-  @@today = 0
-  #1 => imadegawa, 2 => tanabe
-  @@place = 0
-  @@url = ""
-  @@mon = Array.new(8, nil)
-  @@tue = Array.new(8, nil)
-  @@wed = Array.new(8, nil)
-  @@thu = Array.new(8, nil)
-  @@fri = Array.new(8, nil)
-  @@sat = Array.new(8, nil)
-  #@@no_lec = {:mon => @@mon, :tue => @@tue, :wed => @@wed, :thu => @@thu, :fri => @@fri, :sat => @@sat}
-  @@no_lec = [nil, @@mon, @@tue, @@wed, @@thu, @@fri, @@sat]
+	def initialize(today, place)
+		#1 => mon, 2 => tue,,,
+		@today = today
+		#1 => imadegawa, 2 => tanabe
+    @place = place
+		@mon = Array.new(8, nil)
+		@tue = Array.new(8, nil)
+		@wed = Array.new(8, nil)
+		@thu = Array.new(8, nil)
+		@fri = Array.new(8, nil)
+		@sat = Array.new(8, nil)
+		#@no_lec = {:mon => @mon, :tue => @tue, :wed => @wed, :thu => @thu, :fri => @fri, :sat => @sat}
+		@no_lec = [nil, @mon, @tue, @wed, @thu, @fri, @sat]
 
-
-  def initialize(today, place)
-    @@today = today
-    @@place = place
-    @@url = "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=#{@@today.to_s}&kouchi=#{@@place.to_s}"
+    @url = "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=#{@today.to_s}&kouchi=#{@place.to_s}"
   end
 
   def set_url(today, place)
-    @@url = "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=#{today}&kouchi=#{place}"
+    @url = "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=#{today}&kouchi=#{place}"
   end
 
 	def set_today(youbi)
-		@@today = youbi
-    @@url = "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=#{@@today}&kouchi=#{@@place}"
+		@today = youbi
+    @url = "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=#{@today}&kouchi=#{@place}"
 	end
 
   def show_nolec()
-    return @@no_lec
+    return @no_lec
   end
 
   def show_today()
-     return @@today
+     return @today
 	end
 
   def change_youbi_int(arg)
@@ -58,10 +54,10 @@ class NoLectures
   end
 
   def tomorrow(today)
-    @@today = today
-    @@today = @@today + 1
-    @@today = 1 if @@today == 7 
-    set_url(@@today, @@place)
+    @today = today
+    @today = @today + 1
+    @today = 1 if @today == 7 
+    set_url(@today, @place)
   end
 
   def xml_to_text(xml)
@@ -72,10 +68,10 @@ class NoLectures
   end
 
   def crawl_today()
-    charset = open(@@url).charset
+    charset = open(@url).charset
     nangen = 0
 
-    doc = Nokogiri::HTML.parse(open(@@url), nil, charset)
+    doc = Nokogiri::HTML.parse(open(@url), nil, charset)
     subjects = doc.css('.style1').each do |node|
       if node.children.inner_text.include?("講時") then
         @array = []
@@ -98,14 +94,14 @@ class NoLectures
 
         @array << {:sub_name => sub_name.toutf8, :lecturer => lecturer.toutf8, :reason => reason.toutf8}
       end
-      @@no_lec[@@today][nangen] = @array
+      @no_lec[@today][nangen] = @array
     end
   end
 
   def crawl_week()
     6.times do |i|
       crawl_today()
-      tomorrow(@@today) 
+      tomorrow(@today) 
     end
   end
 
