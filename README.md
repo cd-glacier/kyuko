@@ -1,3 +1,4 @@
 # 休講botを作りたい
 
-[twitter](https://twitter.com/kyuko_tanabe)
+[今出川twitter](https://twitter.com/kyuko_imadegawa)
+[田辺twitter](https://twitter.com/kyuko_tanabe)
