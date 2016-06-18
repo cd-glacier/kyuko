@@ -1,6 +1,4 @@
 # encoding: utf-8
-require '/projects/kyuko/pass.rb'
-# require "./pass.rb"
 require 'twitter'
 require 'clockwork'
 require 'date'
@@ -8,17 +6,12 @@ require '/projects/kyuko/app.rb'
 # require "./app.rb"
 
 class Tweet
-  def initialize(c_key, c_secret, a_token, a_token_secret, place)
-    @consumer_key = ''
-    @consemer_secret = ''
-    @access_token = ''
-    @access_token_secret = ''
-
+  def initialize(place)
     @client = Twitter::REST::Client.new(
-      consumer_key:        c_key,
-      consumer_secret:     c_secret,
-      access_token:        a_token,
-      access_token_secret: a_token_secret
+      consumer_key:        ENV['TWITTER_CONSUMER_KEY'],
+      consumer_secret:     ENV['TWITTER_CONSUMER_SECRET'],
+      access_token:        ENV['TWITTER_ACCESS_TOKEN'],
+      access_token_secret: ENV['TWITTER_ACCESS_TOKEN_SECRET']
     )
 
     @nolec = NoLectures.new(@youbi, place)
@@ -91,7 +84,7 @@ every(2.hours, 'work') do
   puts "田辺"
   # 田辺
   # 今日の曜日をset
-  tw_tanabe = Tweet.new(T_CONSUMER_KEY, T_CONSUMER_SECRET, T_ACCESS_TOKEN, T_ACCESS_TOKEN_SECRET, 2)
+  tw_tanabe = Tweet.new(2)
   # 今何時か調べて、21よりあとなら明日の情報
   tw_tanabe.set_tomorrow
   tw_tanabe.create_contents
@@ -100,7 +93,7 @@ every(2.hours, 'work') do
   puts "今出川"
   # 今出川
   # 今日の曜日をset
-  tw_imade = Tweet.new(I_CONSUMER_KEY, I_CONSUMER_SECRET, I_ACCESS_TOKEN, I_ACCESS_TOKEN_SECRET, 1)
+  tw_imade = Tweet.new(1)
   # 今何時か調べて、21よりあとなら明日の情報
   tw_imade.set_tomorrow
   tw_imade.create_contents
