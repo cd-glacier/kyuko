@@ -14,7 +14,7 @@ GEM
       activesupport
       tzinfo
     daemons (1.2.3)
-    domain_name (0.5.20160310)
+    domain_name (0.5.20160615)
       unf (>= 0.0.5, < 1.0.0)
     equalizer (0.0.10)
     faraday (0.9.2)

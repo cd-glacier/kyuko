@@ -1,11 +1,11 @@
 # encoding: utf-8
-require '/projects/kyuko/pass.rb'
-# require "./pass.rb"
+# require '/projects/kyuko/pass.rb'
+require './pass.rb'
 require 'twitter'
 require 'clockwork'
 require 'date'
-require '/projects/kyuko/app.rb'
-# require "./app.rb"
+# require '/projects/kyuko/app.rb'
+require './app.rb'
 
 class Tweet
   def initialize(c_key, c_secret, a_token, a_token_secret, place)
@@ -24,7 +24,7 @@ class Tweet
     @nolec = NoLectures.new(@youbi, place)
     @date = DateTime.now
     @youbi = @nolec.change_youbi_int(@date.strftime('%a'))
-    @nolec.set_today(@youbi)
+    @nolec.set_today(@youbi) 
     @contents = []
   end
 
@@ -41,6 +41,12 @@ class Tweet
 
   def create_contents
     @nolec.crawl_today
+
+    #日曜日なら
+    if @nolec.show_today == 7 then
+      return nil
+    end
+
     youbi_name = @nolec.change_youbi_int(@nolec.show_today)
     nolec = @nolec.show_nolec
 
@@ -50,6 +56,7 @@ class Tweet
     nil_counter = 0
     nolec[@nolec.show_today].each do |ttable|
       unless i == 0
+        content = "#{youbi_name}曜日の休講情報\n#{@date.strftime("%H時%M分")}時点\n"
         if ttable.nil?
           nil_counter += 1
         else
@@ -58,13 +65,7 @@ class Tweet
             sub_name = sub_info[:sub_name]
             lecturer = sub_info[:lecturer]
             reason = sub_info[:reason]
-
-            content << "#{nangen}限目:#{sub_name} 講師(#{lecturer})\n"
-
-            unless content[100].nil?
-              @contents << content
-              content = "#{youbi_name}曜日の休講情報\n#{@date.strftime("%H時%M分")}時点\n"
-            end
+            @contents << content unless content[100].nil?
           end
         end
       end
@@ -80,14 +81,14 @@ class Tweet
   def update_tweet
     @contents.each do |content|
       puts content
-      @client.update(content)
+      # @client.update(content)
     end
   end
 end
 
 include Clockwork
 
-every(2.hours, 'work') do
+every(4.hours, 'work') do
   puts "田辺"
   # 田辺
   # 今日の曜日をset
