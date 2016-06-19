@@ -24,7 +24,7 @@ class Tweet
     @nolec = NoLectures.new(@youbi, place)
     @date = DateTime.now
     @youbi = @nolec.change_youbi_int(@date.strftime('%a'))
-    @nolec.set_today(@youbi) 
+    @nolec.set_today(@youbi)
     @contents = []
   end
 
@@ -42,10 +42,8 @@ class Tweet
   def create_contents
     @nolec.crawl_today
 
-    #日曜日なら
-    if @nolec.show_today == 7 then
-      return nil
-    end
+    # 日曜日なら
+    return nil if @nolec.show_today == 7
 
     youbi_name = @nolec.change_youbi_int(@nolec.show_today)
     nolec = @nolec.show_nolec
@@ -79,9 +77,11 @@ class Tweet
   end
 
   def update_tweet
-    @contents.each do |content|
-      puts content
-      # @client.update(content)
+    unless @contents.empty?
+      @contents.each do |content|
+        puts content
+        # @client.update(content)
+      end
     end
   end
 end
