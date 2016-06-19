@@ -40,6 +40,8 @@ class Tweet
   end
 
   def create_contents
+    #### test ####
+    @nolec.set_today(1)
     @nolec.crawl_today
 
     # 日曜日なら
@@ -63,7 +65,12 @@ class Tweet
             sub_name = sub_info[:sub_name]
             lecturer = sub_info[:lecturer]
             reason = sub_info[:reason]
-            @contents << content unless content[100].nil?
+
+            content << "#{nangen}限目:#{sub_name} 講師(#{lecturer})\n"    
+            unless content[100].nil?   
+              @contents << content   
+              content = ""
+            end
           end
         end
       end
