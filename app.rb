@@ -2,8 +2,7 @@
 require 'nokogiri'
 require 'open-uri'
 require 'kconv'
-require '/projects/kyuko/pass.rb'
-# require "./pass.rb"
+require_relative 'pass.rb'
 
 class NoLectures
   def initialize(today, place)
