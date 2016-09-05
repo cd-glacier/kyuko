@@ -63,7 +63,7 @@ class Tweet
 
             content << "#{nangen}限目:#{sub_name} 講師(#{lecturer})\n"
 
-            unless content[100].nil? then
+            unless content[90].nil? then
               @contents << content
               content = "#{youbi_name}曜日の休講情報\n#{@date.strftime("%H時%M分")}時点\n" 
             end
@@ -96,7 +96,7 @@ end
 
 include Clockwork
 
-every(2.hours, "work") do
+every(4.hours, "work") do
 
 	puts "田辺"
 	#田辺
