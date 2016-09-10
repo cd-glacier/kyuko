@@ -61,11 +61,7 @@ class Tweet
 
             content << "#{nangen}限目:#{sub_name} 講師(#{lecturer})\n"
 
-<<<<<<< HEAD
             unless content[90].nil? then
-=======
-            unless content[100].nil?
->>>>>>> 4f7e2ef92f4d41b3c27edca9b48f6461f7fc553b
               @contents << content
               content = "#{youbi_name}曜日の休講情報\n#{@date.strftime("%H時%M分")}時点\n"
             end
