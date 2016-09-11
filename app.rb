@@ -1,9 +1,10 @@
 # encoding: utf-8
+# frozen_string_literal: true
 require 'nokogiri'
 require 'open-uri'
 require 'kconv'
-#require '/projects/kyuko/pass.rb'
-require_relative "./pass.rb"
+# require '/projects/kyuko/pass.rb'
+require_relative './pass.rb'
 
 class NoLectures
   def initialize(today, place)
@@ -42,7 +43,7 @@ class NoLectures
    end
 
   def change_youbi_int(arg)
-    i_to_youbi = { 1 => "月", 2 => "火", 3 => "水", 4 => "木", 5 => "金", 6 => "土", 7 => "日" }
+    i_to_youbi = { 1 => '月', 2 => '火', 3 => '水', 4 => '木', 5 => '金', 6 => '土', 7 => '日' }
     youbi_to_i = { 'Mon' => 1, 'Tue' => 2, 'Wed' => 3, 'Thu' => 4, 'Fri' => 5, 'Sat' => 6, 'Sun' => 7 }
     if arg.is_a?(Integer)
       return i_to_youbi[arg]
@@ -58,7 +59,7 @@ class NoLectures
     @today += 1
     @today = 1 if @today == 7
     set_url("http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=#{@today}&kouchi=#{@place}")
-    return @today
+    @today
   end
 
   def xml_to_text(xml)
@@ -69,20 +70,18 @@ class NoLectures
   end
 
   def crawl_today
-    #charset = open(@url).charset
+    # charset = open(@url).charset
     nangen = 0
 
-    #doc = Nokogiri::HTML.parse(open(@url), nil, charset)
-    doc = Nokogiri::HTML.parse(open(@url), nil, "shift_jis")
+    # doc = Nokogiri::HTML.parse(open(@url), nil, charset)
+    doc = Nokogiri::HTML.parse(open(@url), nil, 'shift_jis')
 
-    if doc.css(".styleE").inner_text.include?("該当する休講はありません") then
-      return 0
-    end
+    return 0 if doc.css('.styleE').inner_text.include?('該当する休講はありません')
 
     subjects = doc.css('.style1').each do |node|
-      if node.children.inner_text.include?("講時")
+      if node.children.inner_text.include?('講時')
         @array = []
-        nangen = node.children.css('th').inner_text.delete("講時").to_i
+        nangen = node.children.css('th').inner_text.delete('講時').to_i
 
         sub_name = xml_to_text(node.children.css('td').to_s.split("\n")[0])
         lecturer = xml_to_text(node.children.css('td').to_s.split("\n")[1])
@@ -102,9 +101,8 @@ class NoLectures
         @array << { sub_name: sub_name.toutf8, lecturer: lecturer.toutf8, reason: reason.toutf8 }
       end
       @no_lec[@today][nangen] = @array
-      
-      return @no_lec[@today][nangen].length
 
+      return @no_lec[@today][nangen].length
     end
   end
 

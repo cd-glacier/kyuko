@@ -1,11 +1,12 @@
 # encoding: utf-8
-#require '/projects/kyuko/pass.rb'
-require_relative "./pass.rb"
+# frozen_string_literal: true
+# require '/projects/kyuko/pass.rb'
+require_relative './pass.rb'
 require 'twitter'
 require 'clockwork'
 require 'date'
-#require '/projects/kyuko/app.rb'
-require_relative "./app.rb"
+# require '/projects/kyuko/app.rb'
+require_relative './app.rb'
 
 class Tweet
   def initialize(c_key, c_secret, a_token, a_token_secret, place)
@@ -37,7 +38,7 @@ class Tweet
     set_time
     hour = @date.strftime('%H').to_i
     @nolec.tomorrow(@nolec.show_today) if hour >= 21
-    return @nolec.show_today
+    @nolec.show_today
   end
 
   def create_contents
@@ -45,12 +46,12 @@ class Tweet
     youbi_name = @nolec.change_youbi_int(@nolec.show_today)
     nolec = @nolec.show_nolec
 
-    content = "#{youbi_name}曜日の休講情報\n#{@date.strftime("%H時%M分")}時点\n"
+    content = "#{youbi_name}曜日の休講情報\n#{@date.strftime('%H時%M分')}時点\n"
 
     i = 0
     nil_counter = 0
     nolec[@nolec.show_today].each do |ttable|
-      unless i == 0
+      unless i.zero?
         if ttable.nil?
           nil_counter += 1
         else
@@ -62,9 +63,9 @@ class Tweet
 
             content << "#{nangen}限目:#{sub_name} 講師(#{lecturer})\n"
 
-            unless content[90].nil? then
+            unless content[90].nil?
               @contents << content
-              content = "#{youbi_name}曜日の休講情報\n#{@date.strftime("%H時%M分")}時点\n"
+              content = "#{youbi_name}曜日の休講情報\n#{@date.strftime('%H時%M分')}時点\n"
             end
           end
         end
@@ -76,7 +77,7 @@ class Tweet
 
     @contents << content
     content = nil
-    return @contents
+    @contents
   end
 
   def update_tweet
@@ -89,11 +90,10 @@ end
 
 include Clockwork
 
-every(4.hours, "work") do
-
-	puts "田辺"
-	#田辺
-  #今日の曜日をset	
+every(4.hours, 'work') do
+  puts '田辺'
+  # 田辺
+  # 今日の曜日をset
 
   tw_tanabe = Tweet.new(T_CONSUMER_KEY, T_CONSUMER_SECRET, T_ACCESS_TOKEN, T_ACCESS_TOKEN_SECRET, 2)
   # 今何時か調べて、21よりあとなら明日の情報
@@ -101,7 +101,7 @@ every(4.hours, "work") do
   tw_tanabe.create_contents
   tw_tanabe.update_tweet
 
-  puts "今出川"
+  puts '今出川'
   # 今出川
   # 今日の曜日をset
   tw_imade = Tweet.new(I_CONSUMER_KEY, I_CONSUMER_SECRET, I_ACCESS_TOKEN, I_ACCESS_TOKEN_SECRET, 1)

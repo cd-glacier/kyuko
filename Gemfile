@@ -10,5 +10,4 @@ gem 'twitter'
 
 gem 'rubocop', require: false
 
-gem "rspec"
-
+gem 'rspec'
