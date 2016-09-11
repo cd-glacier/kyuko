@@ -2,8 +2,8 @@
 require 'nokogiri'
 require 'open-uri'
 require 'kconv'
-require '/projects/kyuko/pass.rb'
-# require "./pass.rb"
+#require '/projects/kyuko/pass.rb'
+require_relative "./pass.rb"
 
 class NoLectures
   def initialize(today, place)
@@ -17,14 +17,15 @@ class NoLectures
     @thu = Array.new(8, nil)
     @fri = Array.new(8, nil)
     @sat = Array.new(8, nil)
+    @sun = Array.new(8, nil)
     # @no_lec = {:mon => @mon, :tue => @tue, :wed => @wed, :thu => @thu, :fri => @fri, :sat => @sat}
-    @no_lec = [nil, @mon, @tue, @wed, @thu, @fri, @sat]
+    @no_lec = [nil, @mon, @tue, @wed, @thu, @fri, @sat, @sun]
 
     @url = "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=#{@today}&kouchi=#{@place}"
   end
 
-  def set_url(today, place)
-    @url = "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=#{today}&kouchi=#{place}"
+  def set_url(url)
+    @url = url
   end
 
   def set_today(youbi)
@@ -41,8 +42,8 @@ class NoLectures
    end
 
   def change_youbi_int(arg)
-    i_to_youbi = { 1 => "月", 2 => "火", 3 => "水", 4 => "木", 5 => "金", 6 => "土" }
-    youbi_to_i = { 'Mon' => 1, 'Tue' => 2, 'Wed' => 3, 'Thu' => 4, 'Fri' => 5, 'Sat' => 6 }
+    i_to_youbi = { 1 => "月", 2 => "火", 3 => "水", 4 => "木", 5 => "金", 6 => "土", 7 => "日" }
+    youbi_to_i = { 'Mon' => 1, 'Tue' => 2, 'Wed' => 3, 'Thu' => 4, 'Fri' => 5, 'Sat' => 6, 'Sun' => 7 }
     if arg.is_a?(Integer)
       return i_to_youbi[arg]
     elsif arg.is_a?(String)
@@ -56,7 +57,8 @@ class NoLectures
     @today = today
     @today += 1
     @today = 1 if @today == 7
-    set_url(@today, @place)
+    set_url("http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=#{@today}&kouchi=#{@place}")
+    return @today
   end
 
   def xml_to_text(xml)
@@ -67,10 +69,16 @@ class NoLectures
   end
 
   def crawl_today
-    charset = open(@url).charset
+    #charset = open(@url).charset
     nangen = 0
 
-    doc = Nokogiri::HTML.parse(open(@url), nil, charset)
+    #doc = Nokogiri::HTML.parse(open(@url), nil, charset)
+    doc = Nokogiri::HTML.parse(open(@url), nil, "shift_jis")
+
+    if doc.css(".styleE").inner_text.include?("該当する休講はありません") then
+      return 0
+    end
+
     subjects = doc.css('.style1').each do |node|
       if node.children.inner_text.include?("講時")
         @array = []
@@ -94,6 +102,9 @@ class NoLectures
         @array << { sub_name: sub_name.toutf8, lecturer: lecturer.toutf8, reason: reason.toutf8 }
       end
       @no_lec[@today][nangen] = @array
+      
+      return @no_lec[@today][nangen].length
+
     end
   end
 

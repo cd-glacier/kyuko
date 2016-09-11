@@ -69,7 +69,7 @@ File.open('./tmp/clockworkd.tweet.output') do |file|
   kyuko = Extraction.new
   kyuko.extract(file)
 
-  #puts kyuko.get_tanabe()
+  puts kyuko.get_tanabe()
 end
 
 
