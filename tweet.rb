@@ -1,11 +1,11 @@
 # encoding: utf-8
-require '/projects/kyuko/pass.rb'
-# require "./pass.rb"
+#require '/projects/kyuko/pass.rb'
+require_relative "./pass.rb"
 require 'twitter'
 require 'clockwork'
 require 'date'
-require '/projects/kyuko/app.rb'
-# require "./app.rb"
+#require '/projects/kyuko/app.rb'
+require_relative "./app.rb"
 
 class Tweet
   def initialize(c_key, c_secret, a_token, a_token_secret, place)
@@ -30,13 +30,14 @@ class Tweet
 
   def set_time
     @date = DateTime.now
-   end
+  end
 
   def set_tomorrow
     # 今何時か調べて、21よりあとなら明日の情報
     set_time
     hour = @date.strftime('%H').to_i
     @nolec.tomorrow(@nolec.show_today) if hour >= 21
+    return @nolec.show_today
   end
 
   def create_contents
@@ -75,6 +76,7 @@ class Tweet
 
     @contents << content
     content = nil
+    return @contents
   end
 
   def update_tweet
