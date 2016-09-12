@@ -88,7 +88,8 @@ class NoLectures
         lecturer = lecturer.delete(' ')
         reason = xml_to_text(node.children.css('td').to_s.split("\n")[2])
         reason = reason.split('&')[0]
-
+        
+        #休講情報
         @array << { sub_name: sub_name.toutf8, lecturer: lecturer.toutf8, reason: reason.toutf8 }
 
       else
@@ -98,6 +99,7 @@ class NoLectures
         reason = xml_to_text(node.children.css('td').to_s.split("\n")[2])
         reason = reason.split('&')[0]
 
+        #休講情報
         @array << { sub_name: sub_name.toutf8, lecturer: lecturer.toutf8, reason: reason.toutf8 }
       end
       @no_lec[@today][nangen] = @array
