@@ -1,5 +1,7 @@
 require "active_record"
+require './model.rb'
 
+=begin
 ActiveRecord::Base.establish_connection(
   adapter:   'sqlite3',
   database:  'kyuko_info'
@@ -23,6 +25,7 @@ end
 
 #最初だけつかう
 #InitialSchema.migrate(:up)
+=end
 
 class Kyuko < ActiveRecord::Base
 end
@@ -95,6 +98,7 @@ class Extraction
 
 end
 
+=begin
 data = Extraction.new
 data.extract_file('./tmp/clockworkd.tweet.output')
 data_imade = data.get_imade
@@ -116,8 +120,9 @@ data_tanabe.each do |data|
   kyuko.date = data[:date]
   kyuko.save
 end
+=end
 
-#p Kyuko.all
+p Kyuko.all
 
 
 

@@ -57,6 +57,7 @@ GEM
     rack-protection (1.5.3)
       rack
     rainbow (2.1.0)
+    rake (11.2.2)
     rspec (3.5.0)
       rspec-core (~> 3.5.0)
       rspec-expectations (~> 3.5.0)
@@ -111,6 +112,7 @@ DEPENDENCIES
   clockwork
   daemons (~> 1.2, >= 1.2.3)
   nokogiri
+  rake
   rspec
   rubocop
   sinatra
