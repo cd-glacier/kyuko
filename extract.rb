@@ -1,5 +1,32 @@
+require "active_record"
 
-# frozen_string_literal: true
+ActiveRecord::Base.establish_connection(
+  adapter:   'sqlite3',
+  database:  'kyuko_info'
+)
+
+class InitialSchema < ActiveRecord::Migration
+  def self.up
+    create_table :kyukos do |t|
+      t.string :name
+      t.integer :when
+      t.string :instructor
+      t.datetime :date
+      t.timestamp
+    end
+  end
+
+  def self.down
+    drop_table :users
+  end
+end
+
+#最初だけつかう
+#InitialSchema.migrate(:up)
+
+class Kyuko < ActiveRecord::Base
+end
+
 class Extraction
   def extract_time(line)
     time = line.split('I, [')[1].split('T')[0]
@@ -21,7 +48,7 @@ class Extraction
     @imade
   end
 
-  def extract(file)
+  def extract_line(file)
     # 0 = その日の情報とれていない,  1 = 田辺を取りたい,
     # 2 = 今出川を取りたい, 3 = その日の情報もうとった
     status = 0
@@ -59,11 +86,44 @@ class Extraction
       end
     end
   end
+
+  def extract_file(file)
+    File.open(file) do |line|
+      extract_line(line)
+    end
+  end
+
 end
 
-File.open('./tmp/clockworkd.tweet.output') do |file|
-  kyuko = Extraction.new
-  kyuko.extract(file)
-
-  puts kyuko.get_tanabe
+data = Extraction.new
+data.extract_file('./tmp/clockworkd.tweet.output')
+data_imade = data.get_imade
+data_imade.each do |data|
+  kyuko = Kyuko.new
+  kyuko.when = data[:when]
+  kyuko.name = data[:name]
+  kyuko.instructor = data[:instructor]
+  kyuko.date = data[:date]
+  kyuko.save
 end
+
+data_tanabe = data.get_tanabe
+data_tanabe.each do |data|
+  kyuko = Kyuko.new
+  kyuko.when = data[:when]
+  kyuko.name = data[:name]
+  kyuko.instructor = data[:instructor]
+  kyuko.date = data[:date]
+  kyuko.save
+end
+
+#p Kyuko.all
+
+
+
+
+
+
+
+
+
