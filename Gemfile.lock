@@ -118,6 +118,3 @@ DEPENDENCIES
   sinatra
   sqlite3
   twitter
-
-BUNDLED WITH
-   1.13.0

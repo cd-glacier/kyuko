@@ -14495,3 +14495,100 @@ I, [2016-09-05T12:32:27.001398 #8895]  INFO -- : Triggering 'work'
 今出川
 月曜日の休講はありません
 end
+I, [2016-09-11T18:27:10.340244 #21264]  INFO -- : Starting clock for 1 events: [ work ]
+I, [2016-09-11T18:27:10.340346 #21264]  INFO -- : Triggering 'work'
+田辺
+日曜日の休講はありません
+今出川
+日曜日の休講はありません
+end
+I, [2016-09-11T22:27:10.001438 #21264]  INFO -- : Triggering 'work'
+田辺
+E, [2016-09-11T22:27:10.320230 #21264] ERROR -- : undefined method `each' for nil:NilClass (NoMethodError)
+/projects/kyuko/tweet.rb:52:in `create_contents'
+/projects/kyuko/tweet.rb:101:in `block in <top (required)>'
+/var/lib/gems/1.9.1/gems/clockwork-2.0.0/lib/clockwork/event.rb:54:in `call'
+/var/lib/gems/1.9.1/gems/clockwork-2.0.0/lib/clockwork/event.rb:54:in `execute'
+/var/lib/gems/1.9.1/gems/clockwork-2.0.0/lib/clockwork/event.rb:44:in `run'
+/var/lib/gems/1.9.1/gems/clockwork-2.0.0/lib/clockwork/manager.rb:75:in `block in tick'
+/var/lib/gems/1.9.1/gems/clockwork-2.0.0/lib/clockwork/manager.rb:73:in `each'
+/var/lib/gems/1.9.1/gems/clockwork-2.0.0/lib/clockwork/manager.rb:73:in `tick'
+/var/lib/gems/1.9.1/gems/clockwork-2.0.0/lib/clockwork/manager.rb:64:in `block in run'
+/var/lib/gems/1.9.1/gems/clockwork-2.0.0/lib/clockwork/manager.rb:63:in `loop'
+/var/lib/gems/1.9.1/gems/clockwork-2.0.0/lib/clockwork/manager.rb:63:in `run'
+/var/lib/gems/1.9.1/gems/clockwork-2.0.0/lib/clockwork.rb:46:in `run'
+/var/lib/gems/1.9.1/gems/clockwork-2.0.0/bin/clockworkd:90:in `block in <top (required)>'
+/var/lib/gems/1.9.1/gems/daemons-1.2.3/lib/daemons/application.rb:265:in `call'
+/var/lib/gems/1.9.1/gems/daemons-1.2.3/lib/daemons/application.rb:265:in `block in start_proc'
+/var/lib/gems/1.9.1/gems/daemons-1.2.3/lib/daemons/daemonize.rb:84:in `call'
+/var/lib/gems/1.9.1/gems/daemons-1.2.3/lib/daemons/daemonize.rb:84:in `call_as_daemon'
+/var/lib/gems/1.9.1/gems/daemons-1.2.3/lib/daemons/application.rb:269:in `start_proc'
+/var/lib/gems/1.9.1/gems/daemons-1.2.3/lib/daemons/application.rb:295:in `start'
+/var/lib/gems/1.9.1/gems/daemons-1.2.3/lib/daemons/controller.rb:56:in `run'
+/var/lib/gems/1.9.1/gems/daemons-1.2.3/lib/daemons.rb:193:in `block in run_proc'
+/var/lib/gems/1.9.1/gems/daemons-1.2.3/lib/daemons/cmdline.rb:88:in `call'
+/var/lib/gems/1.9.1/gems/daemons-1.2.3/lib/daemons/cmdline.rb:88:in `catch_exceptions'
+/var/lib/gems/1.9.1/gems/daemons-1.2.3/lib/daemons.rb:192:in `run_proc'
+/var/lib/gems/1.9.1/gems/clockwork-2.0.0/bin/clockworkd:84:in `<top (required)>'
+/usr/local/bin/clockworkd:23:in `load'
+/usr/local/bin/clockworkd:23:in `<main>'
+I, [2016-09-12T02:27:10.001264 #21264]  INFO -- : Triggering 'work'
+田辺
+月曜日の休講はありません
+今出川
+月曜日の休講はありません
+end
+I, [2016-09-12T06:27:10.001492 #21264]  INFO -- : Triggering 'work'
+田辺
+月曜日の休講はありません
+今出川
+月曜日の休講はありません
+end
+I, [2016-09-12T10:27:10.001547 #21264]  INFO -- : Triggering 'work'
+田辺
+月曜日の休講はありません
+今出川
+月曜日の休講はありません
+end
+I, [2016-09-12T14:27:10.001306 #21264]  INFO -- : Triggering 'work'
+田辺
+月曜日の休講はありません
+今出川
+月曜日の休講はありません
+end
+I, [2016-09-12T18:27:10.001421 #21264]  INFO -- : Triggering 'work'
+田辺
+月曜日の休講はありません
+今出川
+月曜日の休講はありません
+end
+I, [2016-09-12T22:27:10.001477 #21264]  INFO -- : Triggering 'work'
+田辺
+火曜日の休講はありません
+今出川
+火曜日の休講はありません
+end
+I, [2016-09-13T02:27:10.001382 #21264]  INFO -- : Triggering 'work'
+田辺
+火曜日の休講はありません
+今出川
+火曜日の休講はありません
+end
+I, [2016-09-13T06:27:10.001338 #21264]  INFO -- : Triggering 'work'
+田辺
+火曜日の休講はありません
+今出川
+火曜日の休講はありません
+end
+I, [2016-09-13T10:27:10.001345 #21264]  INFO -- : Triggering 'work'
+田辺
+火曜日の休講はありません
+今出川
+火曜日の休講はありません
+end
+I, [2016-09-13T14:27:10.001408 #21264]  INFO -- : Triggering 'work'
+田辺
+火曜日の休講はありません
+今出川
+火曜日の休講はありません
+end
