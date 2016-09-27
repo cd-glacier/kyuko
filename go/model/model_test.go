@@ -1,9 +1,6 @@
 package model
 
-import (
-	"fmt"
-	"testing"
-)
+import "testing"
 
 func TestConnectDB(t *testing.T) {
 	db := DB{}
@@ -29,12 +26,35 @@ func TestInsert(t *testing.T) {
 	}
 	defer db.Close()
 
-	testData := KyukoData{Place: 1, Week: 1, Period: 1, Date: "2016/09/26", ClassName: "DOSUKOI", Instructor: "hoge man", Reason: "darui"}
+	testData := KyukoData{Place: 1, Week: 1, Period: 1, Day: "2016/09/26", ClassName: "Insert Test", Instructor: "hoge man", Reason: "darui"}
 
-	result, err := db.Insert(testData)
+	_, err = db.Insert(testData)
 	if err != nil {
-		t.Fatalf("failed insert: %s", err)
+		t.Fatalf("insert に失敗\n%s", err)
 	}
 
-	fmt.Printf("%s", result)
+	//deleteして入れたデータ消す
+}
+
+func TestSelectAll(t *testing.T) {
+	db := DB{}
+	var err error
+
+	err = db.Connect()
+	if err != nil {
+		t.Fatal("データベースに接続できません")
+	}
+	defer db.Close()
+
+	testData := KyukoData{Place: 1, Week: 1, Period: 1, Day: "2016/09/26", ClassName: "SelectAll Test", Instructor: "tsetMan", Reason: "darui"}
+
+	_, err = db.Insert(testData)
+	if err != nil {
+		t.Fatalf("insert に失敗: %s", err)
+	}
+
+	_, err = db.SelectAll()
+	if err != nil {
+		t.Fatalf("selectAll に失敗\n%s", err)
+	}
 }
