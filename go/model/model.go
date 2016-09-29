@@ -63,3 +63,11 @@ func (this *DB) SelectAll() ([]KyukoData, error) {
 	}
 	return kyukoSlice, err
 }
+
+func (this *DB) DeleteWhereDayAndClassName(day, className string) (sql.Result, error) {
+	result, err := this.db.Exec("delete from kyuko_data where day = ? and class_name = ?", day, className)
+	if err != nil {
+		return result, err
+	}
+	return result, err
+}

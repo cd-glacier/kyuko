@@ -33,7 +33,11 @@ func TestInsert(t *testing.T) {
 		t.Fatalf("insert に失敗\n%s", err)
 	}
 
-	//deleteして入れたデータ消す
+	result, err := db.DeleteWhereDayAndClassName("2016/09/26", "Insert Test")
+	affectedRows, _ := result.RowsAffected()
+	if err != nil || int(affectedRows) <= 0 {
+		t.Fatalf("deleteに失敗\n%s", err)
+	}
 }
 
 func TestSelectAll(t *testing.T) {
@@ -57,4 +61,11 @@ func TestSelectAll(t *testing.T) {
 	if err != nil {
 		t.Fatalf("selectAll に失敗\n%s", err)
 	}
+
+	result, err := db.DeleteWhereDayAndClassName("2016/09/26", "SelectAll Test")
+	affectedRows, _ := result.RowsAffected()
+	if err != nil || int(affectedRows) <= 0 {
+		t.Fatalf("deleteに失敗\n%s", err)
+	}
+
 }
