@@ -26,7 +26,7 @@ func TestInsert(t *testing.T) {
 	}
 	defer db.Close()
 
-	testData := KyukoData{Place: 1, Week: 1, Period: 1, Day: "2016/09/26", ClassName: "Insert Test", Instructor: "hoge man", Reason: "darui"}
+	testData := KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "Insert Test", Instructor: "hoge man", Reason: "darui"}
 
 	_, err = db.Insert(testData)
 	if err != nil {
@@ -50,7 +50,7 @@ func TestSelectAll(t *testing.T) {
 	}
 	defer db.Close()
 
-	testData := KyukoData{Place: 1, Week: 1, Period: 1, Day: "2016/09/26", ClassName: "SelectAll Test", Instructor: "tsetMan", Reason: "darui"}
+	testData := KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "SelectAll Test", Instructor: "tsetMan", Reason: "darui"}
 
 	_, err = db.Insert(testData)
 	if err != nil {

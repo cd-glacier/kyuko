@@ -10,17 +10,6 @@ type DB struct {
 	db *sql.DB
 }
 
-type KyukoData struct {
-	ID         int    `json:id`
-	Place      int    `json:place`
-	Week       int    `json:week`
-	Period     int    `json:period`
-	Day        string `json:date`
-	ClassName  string `josn:className`
-	Instructor string `json:instructor`
-	Reason     string `json:reason`
-}
-
 func (this *DB) Connect() error {
 	var err error
 	this.db, err = sql.Open("mysql", "root:password@/kyuko")
@@ -33,35 +22,35 @@ func (this *DB) Close() error {
 }
 
 func (this *DB) Insert(k KyukoData) (sql.Result, error) {
-	result, err := this.db.Exec("insert into kyuko_data values(?, ?, ?, ?, ?, ?, ?, ?)", 0, k.Place, k.Week, k.Period, k.Day, k.ClassName, k.Instructor, k.Reason)
+	result, err := this.db.Exec("insert into kyuko_data values(?, ?, ?, ?, ?, ?, ?, ?)", 0, k.Place, k.Weekday, k.Period, k.Day, k.ClassName, k.Instructor, k.Reason)
 	return result, err
 }
 
 func ScanAll(rows *sql.Rows) ([]KyukoData, error) {
-	kyukoSlice := []KyukoData{}
+	kyukoData := []KyukoData{}
 	var err error
 	for rows.Next() {
 		var k KyukoData
-		if err = rows.Scan(&k.ID, &k.Place, &k.Week, &k.Period, &k.Day, &k.ClassName, &k.Instructor, &k.Reason); err != nil {
-			return kyukoSlice, err
+		if err = rows.Scan(&k.ID, &k.Place, &k.Weekday, &k.Period, &k.Day, &k.ClassName, &k.Instructor, &k.Reason); err != nil {
+			return kyukoData, err
 		}
-		kyukoSlice = append(kyukoSlice, k)
+		kyukoData = append(kyukoData, k)
 	}
-	return kyukoSlice, err
+	return kyukoData, err
 }
 
 func (this *DB) SelectAll() ([]KyukoData, error) {
-	kyukoSlice := []KyukoData{}
+	kyukoData := []KyukoData{}
 	rows, err := this.db.Query("select * from kyuko_data")
 	if err != nil {
-		return kyukoSlice, err
+		return kyukoData, err
 	}
 	defer rows.Close()
-	kyukoSlice, err = ScanAll(rows)
+	kyukoData, err = ScanAll(rows)
 	if err != nil {
-		return kyukoSlice, err
+		return kyukoData, err
 	}
-	return kyukoSlice, err
+	return kyukoData, err
 }
 
 func (this *DB) DeleteWhereDayAndClassName(day, className string) (sql.Result, error) {
