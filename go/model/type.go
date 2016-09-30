@@ -10,15 +10,3 @@ type KyukoData struct {
 	Instructor string `json:instructor`
 	Reason     string `json:reason`
 }
-
-type Weekday int
-
-const (
-	Sunday Weekday = iota
-	Monday
-	Tuesday
-	Wednesday
-	Thursday
-	Friday
-	Saturday
-)
