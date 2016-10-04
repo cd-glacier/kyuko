@@ -1,5 +1,10 @@
 development:
   dialect: mysql 
+  datasource: root:password@tcp(localhost:3306)/kyuko_dev?parseTime=true&collation=utf8_general_ci&interpolateParams=true
+  dir: migrations
+
+production:
+  dialect: mysql 
   datasource: root:password@tcp(localhost:3306)/kyuko?parseTime=true&collation=utf8_general_ci&interpolateParams=true
   dir: migrations
 
