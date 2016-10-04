@@ -1,4 +1,5 @@
 DBNAME:=kyuko
+TESTDB:=kyuko_dev
 ENV:=development
 
 setup:
@@ -7,8 +8,10 @@ setup:
 build:
 	go build -o cmd/mai cmd/main.go
 
+test/init:
+	mysql -u root -h localhost --protocol tcp -e "create database \`$(TESTDB)\`" -p
+
 migrate/init:
-	sudo mysql.server restrat
 	mysql -u root -h localhost --protocol tcp -e "create database \`$(DBNAME)\`" -p
 
 migrate/up:

@@ -2,6 +2,12 @@ package model
 
 import "testing"
 
+var db DB
+
+func init() {
+	db.Connect()
+}
+
 func TestConnectDB(t *testing.T) {
 	db := DB{}
 	err := db.Connect()
@@ -9,22 +15,10 @@ func TestConnectDB(t *testing.T) {
 		t.Fatal("データベースに接続できません")
 	}
 
-	err = db.Close()
-	if err != nil {
-		t.Fatal("Closeに失敗しました")
-	}
-
 }
 
 func TestInsert(t *testing.T) {
-	db := DB{}
 	var err error
-
-	err = db.Connect()
-	if err != nil {
-		t.Fatal("データベースに接続できません")
-	}
-	defer db.Close()
 
 	testData := KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "Insert Test", Instructor: "hoge man", Reason: "darui"}
 
@@ -35,14 +29,7 @@ func TestInsert(t *testing.T) {
 }
 
 func TestSelectAll(t *testing.T) {
-	db := DB{}
 	var err error
-
-	err = db.Connect()
-	if err != nil {
-		t.Fatal("データベースに接続できません")
-	}
-	defer db.Close()
 
 	testData := KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "SelectAll Test", Instructor: "tsetMan", Reason: "darui"}
 	_, err = db.Insert(testData)
@@ -58,14 +45,7 @@ func TestSelectAll(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	var db DB
 	var err error
-
-	err = db.Connect()
-	if err != nil {
-		t.Fatal("データベースに接続できません")
-	}
-	defer db.Close()
 
 	testData := KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "SelectAll Test", Instructor: "tsetMan", Reason: "darui"}
 	_, err = db.Insert(testData)

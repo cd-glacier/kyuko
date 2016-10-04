@@ -17,7 +17,8 @@ type KyukoData struct {
 
 func SetUrl(place, week int) (string, error) {
 	url := "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1"
-	if place >= 1 && place <= 2 && week >= 1 && week <= 6 {
+	//weekに7(Sunday)はない
+	if (place != 1 && place != 2) || week < 1 || week > 6 {
 		url = url + "&youbi=" + strconv.Itoa(week)
 		url = url + "&kouchi=" + strconv.Itoa(place)
 		return url, nil
@@ -26,6 +27,7 @@ func SetUrl(place, week int) (string, error) {
 	}
 }
 
+//ここまだできない
 func Scrape(url string) (KyukoData, error) {
 	k := KyukoData{}
 	if url == "" {
