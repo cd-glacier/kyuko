@@ -1,6 +1,14 @@
 package scrape
 
-import "testing"
+import (
+	"fmt"
+	"io/ioutil"
+	"reflect"
+	"strings"
+	"testing"
+
+	"github.com/PuerkitoBio/goquery"
+)
 
 func TestSetUrl(t *testing.T) {
 	if url, err := SetUrl(1, 1); url != "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=1&kouchi=1" {
@@ -21,8 +29,58 @@ func TestSetUrl(t *testing.T) {
 
 }
 
+func TestScrapePeriod(t *testing.T) {
+	file, err := ioutil.ReadFile("../testdata/kyuko.html")
+	if err != nil {
+		t.Fatalf("テストデータを開けませんでした\n%s", err)
+	}
+	stringReader := strings.NewReader(string(file))
+
+	doc, err := goquery.NewDocumentFromReader(stringReader)
+	if err != nil {
+		t.Fatalf("テストデータを開けませんでした\n%s", err)
+	}
+
+	/*
+		doc, err := goquery.NewDocument("http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=4&kouchi=2")
+		if err != nil {
+			t.Fatalf("テストデータを開けませんでした\n%s", err)
+		}
+	*/
+
+	periods, err := ScrapePeriod(doc)
+	if err != nil {
+		t.Fatal("periodをスクレイピングできませんでした\n%s", err)
+	}
+
+	testSlice := []int{2, 2, 2, 5}
+	if reflect.DeepEqual(periods, testSlice) {
+		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %d\n got:  %d", testSlice, periods)
+	}
+}
+
+func TestScrapeReason(t *testing.T) {
+	file, err := ioutil.ReadFile("../testdata/kyuko.html")
+	if err != nil {
+		t.Fatalf("テストデータを開けませんでした\n%s", err)
+	}
+	stringReader := strings.NewReader(string(file))
+
+	doc, err := goquery.NewDocumentFromReader(stringReader)
+	if err != nil {
+		t.Fatalf("テストデータを開けませんでした\n%s", err)
+	}
+
+	reasons, err := ScrapeReason(doc)
+	if err != nil {
+		t.Fatalf("reasonをスクレイピングできませんでした\n%s", err)
+	}
+	fmt.Printf("%s", reasons)
+
+}
+
 //まだできてない
-func TestScrape(t *testing.T) {
+func testScrape(t *testing.T) {
 
 	//r, err := Scrape("http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=4&kouchi=2")
 

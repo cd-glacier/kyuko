@@ -2,12 +2,12 @@ package scrape
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	iconv "github.com/djimenez/iconv-go"
-	"github.com/g-hyoga/kyuko/go/model"
 )
 
 //place(1: 今出川 ,2: 京田辺), week(1 ~ 6: Mon ~ Sat)を引数に持ち
@@ -24,6 +24,52 @@ func SetUrl(place, week int) (string, error) {
 	}
 }
 
+func ScrapePeriod(doc *goquery.Document) ([]int, error) {
+	var periods []int
+	var err error
+
+	//エラー処理どうにかする
+	//"1講時"みたいなのが取れる
+	doc.Find("tr.style1").Each(func(i int, s *goquery.Selection) {
+		jisPeriod := s.Find("th.style2").Text()
+		utfPeriod, _ := iconv.ConvertString(jisPeriod, "shift-jis", "utf-8")
+
+		stringPeriod := strings.Split(utfPeriod, "講時")[0]
+		period, _ := strconv.Atoi(stringPeriod)
+
+		if period == 0 && i != 0 {
+			period = periods[i-1]
+		}
+		periods = append(periods, period)
+
+	})
+	return periods, err
+}
+
+func ScrapeReason(doc *goquery.Document) ([]string, error) {
+	var reasons []string
+	var err error
+
+	var jisReasons []string
+	doc.Find("tr.style1").Each(func(i int, s *goquery.Selection) {
+		jisReason := strings.Split(s.Find("td.style3").Text(), "&")[0]
+		jisReasons = append(jisReasons, jisReason)
+	})
+
+	for _, v := range jisReasons {
+		//ここでエラー
+		fmt.Printf("%s", v)
+		reason, err := iconv.ConvertString(v, "shift-jis", "utf-8")
+		if err != nil {
+			return reasons, err
+		}
+		reasons = append(reasons, reason)
+	}
+
+	return reasons, err
+}
+
+/*
 //校地と曜日の情報を含んだurlを引数としてとり、休講structのsliceを返す
 //urlはstaticなfileを指定しても良い(test用)
 func Scrape(url string) ([]model.KyukoData, error) {
@@ -39,14 +85,7 @@ func Scrape(url string) ([]model.KyukoData, error) {
 	doc.Find("tr.style1").Each(func(i int, s *goquery.Selection) {
 		var k model.KyukoData
 
-		//"1講時"みたいなのが取れる
-		rawPeriod := s.Find("th.style2").Text()
-		rawPeriod, err = iconv.ConvertString(rawPeriod, "shift-jis", "utf-8")
-		rawPeriod = strings.Split(rawPeriod, "講時")[0]
-		k.Period, err = strconv.Atoi(rawPeriod)
-		if k.Period == 0 {
-			k.Period = kyukoData[i-1].Period
-		}
+		k, err = ScrapePeriod(i, s)
 
 		//classがないのでこうするしかない
 		tds := s.Find("td")
@@ -84,3 +123,4 @@ func Scrape(url string) ([]model.KyukoData, error) {
 
 	return kyukoData, err
 }
+*/
