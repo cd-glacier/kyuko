@@ -23,13 +23,21 @@ func TestSetUrl(t *testing.T) {
 
 //まだできてない
 func TestScrape(t *testing.T) {
-	noTestHTML := ""
-	if r, err := Scrape(noTestHTML); r.Place == 0 || err != nil {
-		t.Fatal("休講がない時のテストデータでエラー\n")
-	}
 
-	testHTML := ""
-	if r, err := Scrape(testHTML); r.Place == 0 || err != nil {
-		t.Fatal("HTMLから休講情報が取得できないようです\n")
-	}
+	//r, err := Scrape("http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=4&kouchi=2")
+
+	/*
+		file, err := os.Open("../testdata/kyuko.html")
+		if err != nil {
+			t.Fatalf("テストデータを開けませんでした\n%s", err)
+		}
+		defer file.Close()
+
+		r, err := Scrape("", file)
+		if err != nil {
+			t.Fatalf("hoge\n%s", err)
+		}
+
+		fmt.Printf("%d\nhoge\n%d", r, err)
+	*/
 }

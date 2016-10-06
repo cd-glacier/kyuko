@@ -4,6 +4,9 @@ ENV:=development
 
 setup:
 	go get github.com/rubenv/sql-migrate/...
+	go get golang.org/x/text/encoding
+	go get golang.org/x/text/transform
+	go get github.com/PuerkitoBio/goquery
 
 build:
 	go build -o cmd/mai cmd/main.go
