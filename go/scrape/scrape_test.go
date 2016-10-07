@@ -30,6 +30,7 @@ func TestSetUrl(t *testing.T) {
 }
 
 func TestScrapePeriod(t *testing.T) {
+	//休講ある
 	file, err := ioutil.ReadFile("../testdata/kyuko.html")
 	if err != nil {
 		t.Fatalf("テストデータを開けませんでした\n%s", err)
@@ -41,19 +42,34 @@ func TestScrapePeriod(t *testing.T) {
 		t.Fatalf("テストデータを開けませんでした\n%s", err)
 	}
 
-	/*
-		doc, err := goquery.NewDocument("http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=4&kouchi=2")
-		if err != nil {
-			t.Fatalf("テストデータを開けませんでした\n%s", err)
-		}
-	*/
+	//休講ない
+	noKyukoFile, err := ioutil.ReadFile("../testdata/not_kyuko.html")
+	if err != nil {
+		t.Fatalf("テストデータを開けませんでした\n%s", err)
+	}
+	noKyukoStringReader := strings.NewReader(string(noKyukoFile))
 
+	noKyukoDoc, err := goquery.NewDocumentFromReader(noKyukoStringReader)
+	if err != nil {
+		t.Fatalf("テストデータを開けませんでした\n%s", err)
+	}
+
+	//test
 	periods, err := ScrapePeriod(doc)
 	if err != nil {
 		t.Fatal("periodをスクレイピングできませんでした\n%s", err)
 	}
 
 	testSlice := []int{2, 2, 2, 5}
+	if reflect.DeepEqual(periods, testSlice) {
+		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %d\n got:  %d", testSlice, periods)
+	}
+
+	periods, err = ScrapePeriod(noKyukoDoc)
+	if err != nil {
+		t.Fatal("periodをスクレイピングできませんでした\n%s", err)
+	}
+	testSlice = []int{}
 	if reflect.DeepEqual(periods, testSlice) {
 		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %d\n got:  %d", testSlice, periods)
 	}
