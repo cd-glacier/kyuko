@@ -3,8 +3,12 @@ package scrape
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"strconv"
 	"strings"
+
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 
 	"github.com/PuerkitoBio/goquery"
 	iconv "github.com/djimenez/iconv-go"
@@ -22,6 +26,14 @@ func SetUrl(place, week int) (string, error) {
 		url = url + "&kouchi=" + strconv.Itoa(place)
 		return url, nil
 	}
+}
+
+func sjisToUtf8(str string) (string, error) {
+	ret, err := ioutil.ReadAll(transform.NewReader(strings.NewReader(str), japanese.ShiftJIS.NewDecoder()))
+	if err != nil {
+		return "", err
+	}
+	return string(ret), err
 }
 
 func ScrapePeriod(doc *goquery.Document) ([]int, error) {
