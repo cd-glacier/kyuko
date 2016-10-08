@@ -1,9 +1,10 @@
 package scrape
 
 import (
+	"bytes"
 	"errors"
-	"fmt"
-	"io/ioutil"
+	"io"
+	"net/http"
 	"strconv"
 	"strings"
 
@@ -11,7 +12,6 @@ import (
 	"golang.org/x/text/transform"
 
 	"github.com/PuerkitoBio/goquery"
-	iconv "github.com/djimenez/iconv-go"
 )
 
 //place(1: 今出川 ,2: 京田辺), week(1 ~ 6: Mon ~ Sat)を引数に持ち
@@ -28,12 +28,23 @@ func SetUrl(place, week int) (string, error) {
 	}
 }
 
-func sjisToUtf8(str string) (string, error) {
-	ret, err := ioutil.ReadAll(transform.NewReader(strings.NewReader(str), japanese.ShiftJIS.NewDecoder()))
+func Get(url string) (io.Reader, error) {
+	var err error
+
+	resp, err := http.Get(url)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return string(ret), err
+	defer resp.Body.Close()
+
+	body := bytes.Buffer{}
+	body.ReadFrom(resp.Body)
+
+	reader := bytes.NewReader(body.Bytes())
+	utfBody := transform.NewReader(reader, japanese.ShiftJIS.NewDecoder())
+
+	return utfBody, nil
+
 }
 
 func ScrapePeriod(doc *goquery.Document) ([]int, error) {
@@ -43,10 +54,10 @@ func ScrapePeriod(doc *goquery.Document) ([]int, error) {
 	//エラー処理どうにかする
 	//"1講時"みたいなのが取れる
 	doc.Find("tr.style1").Each(func(i int, s *goquery.Selection) {
-		jisPeriod := s.Find("th.style2").Text()
-		utfPeriod, _ := iconv.ConvertString(jisPeriod, "shift-jis", "utf-8")
+		originalPeriod := s.Find("th.style2").Text()
 
-		stringPeriod := strings.Split(utfPeriod, "講時")[0]
+		stringPeriod := strings.Split(originalPeriod, "講時")[0]
+		stringPeriod = strings.Replace(stringPeriod, "\n", "", -1)
 		period, _ := strconv.Atoi(stringPeriod)
 
 		if period == 0 && i != 0 {
@@ -62,21 +73,12 @@ func ScrapeReason(doc *goquery.Document) ([]string, error) {
 	var reasons []string
 	var err error
 
-	var jisReasons []string
 	doc.Find("tr.style1").Each(func(i int, s *goquery.Selection) {
-		jisReason := strings.Split(s.Find("td.style3").Text(), "&")[0]
-		jisReasons = append(jisReasons, jisReason)
-	})
-
-	for _, v := range jisReasons {
-		//ここでエラー
-		fmt.Printf("%s", v)
-		reason, err := iconv.ConvertString(v, "shift-jis", "utf-8")
-		if err != nil {
-			return reasons, err
-		}
+		reason := s.Find("td.style3").Text()
+		reason = strings.Replace(reason, "\n", "", -1)
+		reason = strings.Replace(reason, " ", "", -1)
 		reasons = append(reasons, reason)
-	}
+	})
 
 	return reasons, err
 }
