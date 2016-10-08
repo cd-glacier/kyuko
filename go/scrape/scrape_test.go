@@ -1,14 +1,24 @@
 package scrape
 
 import (
-	"fmt"
 	"io/ioutil"
 	"reflect"
 	"strings"
 	"testing"
 
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
+
 	"github.com/PuerkitoBio/goquery"
 )
+
+func SjisToUtf8(str string) (string, error) {
+	ret, err := ioutil.ReadAll(transform.NewReader(strings.NewReader(str), japanese.ShiftJIS.NewDecoder()))
+	if err != nil {
+		return "", err
+	}
+	return string(ret), err
+}
 
 func TestSetUrl(t *testing.T) {
 	if url, err := SetUrl(1, 1); url != "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=1&kouchi=1" {
