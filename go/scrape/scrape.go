@@ -77,6 +77,8 @@ func ScrapeReason(doc *goquery.Document) ([]string, error) {
 		reason := s.Find("td.style3").Text()
 		reason = strings.Replace(reason, "\n", "", -1)
 		reason = strings.Replace(reason, " ", "", -1)
+		byteReason := []byte(reason)
+		reason = string(byteReason[0 : len(byteReason)-2])
 		reasons = append(reasons, reason)
 	})
 
