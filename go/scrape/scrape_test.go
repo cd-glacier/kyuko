@@ -35,7 +35,11 @@ func TestScrapePeriod(t *testing.T) {
 	if err != nil {
 		t.Fatalf("テストデータを開けませんでした\n%s", err)
 	}
-	stringReader := strings.NewReader(string(file))
+	utfFile, err := SjisToUtf8(string(file))
+	if err != nil {
+		t.Fatalf("文字コードの変換に失敗しました\n%s", err)
+	}
+	stringReader := strings.NewReader(utfFile)
 
 	doc, err := goquery.NewDocumentFromReader(stringReader)
 	if err != nil {
@@ -47,7 +51,12 @@ func TestScrapePeriod(t *testing.T) {
 	if err != nil {
 		t.Fatalf("テストデータを開けませんでした\n%s", err)
 	}
-	noKyukoStringReader := strings.NewReader(string(noKyukoFile))
+	utfNoKyukoFile, err := SjisToUtf8(string(noKyukoFile))
+	if err != nil {
+		t.Fatalf("文字コードの変換に失敗しました\n%s", err)
+	}
+
+	noKyukoStringReader := strings.NewReader(string(utfNoKyukoFile))
 
 	noKyukoDoc, err := goquery.NewDocumentFromReader(noKyukoStringReader)
 	if err != nil {
@@ -70,17 +79,31 @@ func TestScrapePeriod(t *testing.T) {
 		t.Fatal("periodをスクレイピングできませんでした\n%s", err)
 	}
 	testSlice = []int{}
-	if reflect.DeepEqual(periods, testSlice) {
-		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %d\n got:  %d", testSlice, periods)
+	if !reflect.DeepEqual(periods, testSlice) {
+		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testSlice, periods)
 	}
 }
 
 func TestScrapeReason(t *testing.T) {
+
+	/*
+		//httpでやるとき
+			stringReader, err := Get("http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=2&kouchi=2")
+			if err != nil {
+				t.Fatal("hoge\n%v", err)
+			}
+	*/
+
+	//testfileのenocde
 	file, err := ioutil.ReadFile("../testdata/kyuko.html")
 	if err != nil {
 		t.Fatalf("テストデータを開けませんでした\n%s", err)
 	}
-	stringReader := strings.NewReader(string(file))
+	utfFile, err := SjisToUtf8(string(file))
+	if err != nil {
+		t.Fatalf("文字コードの変換に失敗しました\n%s", err)
+	}
+	stringReader := strings.NewReader(utfFile)
 
 	doc, err := goquery.NewDocumentFromReader(stringReader)
 	if err != nil {
@@ -91,8 +114,11 @@ func TestScrapeReason(t *testing.T) {
 	if err != nil {
 		t.Fatalf("reasonをスクレイピングできませんでした\n%s", err)
 	}
-	fmt.Printf("%s", reasons)
 
+	testSlice := []string{"公務", "出張", "公務", ""}
+	if !reflect.DeepEqual(reasons, testSlice) {
+		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testSlice, reasons)
+	}
 }
 
 //まだできてない
