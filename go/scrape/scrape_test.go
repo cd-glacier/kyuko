@@ -1,6 +1,7 @@
 package scrape
 
 import (
+	"io"
 	"io/ioutil"
 	"reflect"
 	"strings"
@@ -12,12 +13,44 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+var kyukoDoc, noKyukoDoc *goquery.Document
+
+const (
+	KYUKOFILE   = "../testdata/kyuko.html"
+	NOKYUKOFILE = "../testdata/not_kyuko.html"
+)
+
 func SjisToUtf8(str string) (string, error) {
 	ret, err := ioutil.ReadAll(transform.NewReader(strings.NewReader(str), japanese.ShiftJIS.NewDecoder()))
 	if err != nil {
 		return "", err
 	}
 	return string(ret), err
+}
+
+func EncodeTestFile(fileName string) (io.Reader, error) {
+	//testfileのenocde
+	file, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		return nil, err
+	}
+	utfFile, err := SjisToUtf8(string(file))
+	if err != nil {
+		return nil, err
+	}
+	stringReader := strings.NewReader(utfFile)
+
+	return stringReader, nil
+}
+
+func init() {
+	//休講ある
+	kyukoReader, _ := EncodeTestFile(KYUKOFILE)
+	kyukoDoc, _ = goquery.NewDocumentFromReader(kyukoReader)
+
+	//休講ない
+	noKyukoReader, _ := EncodeTestFile(NOKYUKOFILE)
+	noKyukoDoc, _ = goquery.NewDocumentFromReader(noKyukoReader)
 }
 
 func TestSetUrl(t *testing.T) {
@@ -40,41 +73,7 @@ func TestSetUrl(t *testing.T) {
 }
 
 func TestScrapePeriod(t *testing.T) {
-	//休講ある
-	file, err := ioutil.ReadFile("../testdata/kyuko.html")
-	if err != nil {
-		t.Fatalf("テストデータを開けませんでした\n%s", err)
-	}
-	utfFile, err := SjisToUtf8(string(file))
-	if err != nil {
-		t.Fatalf("文字コードの変換に失敗しました\n%s", err)
-	}
-	stringReader := strings.NewReader(utfFile)
-
-	doc, err := goquery.NewDocumentFromReader(stringReader)
-	if err != nil {
-		t.Fatalf("テストデータを開けませんでした\n%s", err)
-	}
-
-	//休講ない
-	noKyukoFile, err := ioutil.ReadFile("../testdata/not_kyuko.html")
-	if err != nil {
-		t.Fatalf("テストデータを開けませんでした\n%s", err)
-	}
-	utfNoKyukoFile, err := SjisToUtf8(string(noKyukoFile))
-	if err != nil {
-		t.Fatalf("文字コードの変換に失敗しました\n%s", err)
-	}
-
-	noKyukoStringReader := strings.NewReader(string(utfNoKyukoFile))
-
-	noKyukoDoc, err := goquery.NewDocumentFromReader(noKyukoStringReader)
-	if err != nil {
-		t.Fatalf("テストデータを開けませんでした\n%s", err)
-	}
-
-	//test
-	periods, err := ScrapePeriod(doc)
+	periods, err := ScrapePeriod(kyukoDoc)
 	if err != nil {
 		t.Fatal("periodをスクレイピングできませんでした\n%s", err)
 	}
@@ -103,24 +102,7 @@ func TestScrapeReason(t *testing.T) {
 				t.Fatal("hoge\n%v", err)
 			}
 	*/
-
-	//testfileのenocde
-	file, err := ioutil.ReadFile("../testdata/kyuko.html")
-	if err != nil {
-		t.Fatalf("テストデータを開けませんでした\n%s", err)
-	}
-	utfFile, err := SjisToUtf8(string(file))
-	if err != nil {
-		t.Fatalf("文字コードの変換に失敗しました\n%s", err)
-	}
-	stringReader := strings.NewReader(utfFile)
-
-	doc, err := goquery.NewDocumentFromReader(stringReader)
-	if err != nil {
-		t.Fatalf("テストデータを開けませんでした\n%s", err)
-	}
-
-	reasons, err := ScrapeReason(doc)
+	reasons, err := ScrapeReason(kyukoDoc)
 	if err != nil {
 		t.Fatalf("reasonをスクレイピングできませんでした\n%s", err)
 	}
@@ -129,6 +111,24 @@ func TestScrapeReason(t *testing.T) {
 	if !reflect.DeepEqual(reasons, testSlice) {
 		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testSlice, reasons)
 	}
+}
+
+func TestScrapeNameAndInstructor(t *testing.T) {
+	names, instructors, err := ScrapeNameAndInstructor(kyukoDoc)
+	if err != nil {
+		t.Fatalf("Nameのスクレイピングに失敗したようです\n%s", err)
+	}
+
+	testSlice := []string{"環境生理学", "電気・電子計測Ｉ－１", "応用数学ＩＩ－１", "イングリッシュ・セミナー２－７０２"}
+	if !reflect.DeepEqual(names, testSlice) {
+		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testSlice, names)
+	}
+
+	testSlice = []string{"福岡義之", "松川真美", "大川領", "稲垣俊史"}
+	if !reflect.DeepEqual(instructors, testSlice) {
+		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testSlice, instructors)
+	}
+
 }
 
 //まだできてない
