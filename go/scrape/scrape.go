@@ -83,6 +83,26 @@ func ScrapeReason(doc *goquery.Document) ([]string, error) {
 	return reasons, err
 }
 
+func ScrapeNameAndInstructor(doc *goquery.Document) (names, instructors []string, err error) {
+	doc.Find("tr.style1 > td").Each(func(i int, s *goquery.Selection) {
+		var name, instructor string
+
+		switch i % 3 {
+		case 0:
+			name = s.Text()
+			name = strings.Replace(name, " ", "", -1)
+			names = append(names, name)
+		case 1:
+			instructor = s.Text()
+			instructor = strings.Replace(instructor, " ", "", -1)
+			instructors = append(instructors, instructor)
+		}
+
+	})
+
+	return names, instructors, nil
+}
+
 /*
 //校地と曜日の情報を含んだurlを引数としてとり、休講structのsliceを返す
 //urlはstaticなfileを指定しても良い(test用)
