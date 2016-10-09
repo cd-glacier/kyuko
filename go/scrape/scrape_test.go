@@ -79,7 +79,7 @@ func TestScrapePeriod(t *testing.T) {
 	}
 
 	testSlice := []int{2, 2, 2, 5}
-	if reflect.DeepEqual(periods, testSlice) {
+	if !reflect.DeepEqual(periods, testSlice) {
 		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %d\n got:  %d", testSlice, periods)
 	}
 
@@ -87,8 +87,7 @@ func TestScrapePeriod(t *testing.T) {
 	if err != nil {
 		t.Fatal("periodをスクレイピングできませんでした\n%s", err)
 	}
-	testSlice = []int{}
-	if !reflect.DeepEqual(periods, testSlice) {
+	if len(periods) != 0 {
 		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testSlice, periods)
 	}
 }
