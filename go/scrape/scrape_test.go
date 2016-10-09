@@ -88,7 +88,7 @@ func TestScrapePeriod(t *testing.T) {
 		t.Fatal("periodをスクレイピングできませんでした\n%s", err)
 	}
 	if len(periods) != 0 {
-		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testSlice, periods)
+		t.Fatalf("取得した結果が求めるものと違ったようです\ngot:  %v", periods)
 	}
 }
 
@@ -110,6 +110,15 @@ func TestScrapeReason(t *testing.T) {
 	if !reflect.DeepEqual(reasons, testSlice) {
 		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testSlice, reasons)
 	}
+
+	reasons, err = ScrapeReason(noKyukoDoc)
+	if err != nil {
+		t.Fatal("periodをスクレイピングできませんでした\n%s", err)
+	}
+	if len(reasons) != 0 {
+		t.Fatalf("取得した結果が求めるものと違ったようです\ngot:  %v", reasons)
+	}
+
 }
 
 func TestScrapeNameAndInstructor(t *testing.T) {
@@ -126,6 +135,17 @@ func TestScrapeNameAndInstructor(t *testing.T) {
 	testSlice = []string{"福岡義之", "松川真美", "大川領", "稲垣俊史"}
 	if !reflect.DeepEqual(instructors, testSlice) {
 		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testSlice, instructors)
+	}
+
+	names, instructors, err = ScrapeNameAndInstructor(noKyukoDoc)
+	if err != nil {
+		t.Fatal("periodをスクレイピングできませんでした\n%s", err)
+	}
+	if len(names) != 0 {
+		t.Fatalf("取得した結果が求めるものと違ったようです\ngot:  %v", names)
+	}
+	if len(instructors) != 0 {
+		t.Fatalf("取得した結果が求めるものと違ったようです\ngot:  %v", instructors)
 	}
 
 }
