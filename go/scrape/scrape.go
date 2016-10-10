@@ -12,6 +12,7 @@ import (
 	"golang.org/x/text/transform"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/g-hyoga/kyuko/go/model"
 )
 
 //place(1: 今出川 ,2: 京田辺), week(1 ~ 6: Mon ~ Sat)を引数に持ち
@@ -44,7 +45,6 @@ func Get(url string) (io.Reader, error) {
 	utfBody := transform.NewReader(reader, japanese.ShiftJIS.NewDecoder())
 
 	return utfBody, nil
-
 }
 
 func ScrapePeriod(doc *goquery.Document) ([]int, error) {
@@ -104,58 +104,92 @@ func ScrapeNameAndInstructor(doc *goquery.Document) (names, instructors []string
 	return names, instructors, nil
 }
 
-/*
-//校地と曜日の情報を含んだurlを引数としてとり、休講structのsliceを返す
-//urlはstaticなfileを指定しても良い(test用)
-func Scrape(url string) ([]model.KyukoData, error) {
+func ScrapeDay(doc *goquery.Document) (string, error) {
+	day := doc.Find("tr.styleT > th").Text()
+	day = strings.Split(day, "]")[1]
+	day = strings.Split(day, "(")[0]
+	day = strings.Replace(day, " ", "", -1)
+	day = strings.Replace(day, "\n", "", -1)
+	day = strings.Replace(day, "\u00a0", "", -1)
+	year := strings.Split(day, "年")[0]
+	month := strings.Split(strings.Split(day, "年")[1], "月")[0]
+	date := strings.Split(strings.Split(day, "日")[0], "月")[1]
+
+	return string(year) + "/" + string(month) + "/" + string(date), nil
+}
+
+func ScrapePlace(doc *goquery.Document) (int, error) {
+	place := doc.Find("tr.styleT > th").Text()
+	place = strings.Split(place, "]")[0]
+	place = strings.Replace(place, "[", "", -1)
+
+	if place == "今出川" {
+		return 1, nil
+	} else if place == "京田辺" {
+		return 2, nil
+	}
+
+	return 0, errors.New("place not found")
+
+}
+
+func ConvertWeekStoi(weekday string) (int, error) {
+	weekMap := map[string]int{"日": 0, "月": 1, "火": 2, "水": 3, "木": 4, "金": 5, "土": 6}
+
+	if _, ok := weekMap[weekday]; !ok {
+		return -1, errors.New("存在しない曜日が入力されています")
+	}
+
+	return weekMap[weekday], nil
+}
+
+func ScrapeWeekday(doc *goquery.Document) (int, error) {
+	weekday := doc.Find("tr.styleT > th").Text()
+	weekday = strings.Split(weekday, "(")[1]
+	weekday = strings.Replace(weekday, ")", "", -1)
+	weekday = strings.Replace(weekday, " ", "", -1)
+	weekday = strings.Replace(weekday, "\n", "", -1)
+	weekday = strings.Replace(weekday, "\u00a0", "", -1)
+	youbi, err := ConvertWeekStoi(weekday)
+
+	if err != nil {
+		return -1, err
+	}
+
+	return youbi, nil
+
+}
+
+//休講structのsliceを返す
+func Scrape(doc *goquery.Document) ([]model.KyukoData, error) {
 	var kyukoData []model.KyukoData
 	var err error
 
-	doc, err := goquery.NewDocument(url)
+	periods, err := ScrapePeriod(doc)
+	reasons, err := ScrapeReason(doc)
+	names, instructors, err := ScrapeNameAndInstructor(doc)
+	weekday, err := ScrapeWeekday(doc)
+	day, err := ScrapeDay(doc)
+	place, err := ScrapePlace(doc)
 	if err != nil {
-		return kyukoData, err
+		return nil, err
 	}
 
-	//ここのエラー処理どうしよう
-	doc.Find("tr.style1").Each(func(i int, s *goquery.Selection) {
-		var k model.KyukoData
+	if len(periods) != len(reasons) && len(periods) != len(names) && len(periods) != len(instructors) {
+		return nil, errors.New("取得できていない情報があります")
+	}
 
-		k, err = ScrapePeriod(i, s)
-
-		//classがないのでこうするしかない
-		tds := s.Find("td")
-		for i := range tds.Nodes {
-			tmp, _ := iconv.ConvertString(tds.Eq(i).Text(), "shift-jis", "utf-8")
-			//授業名の時
-			if i%3 == 0 {
-				k.ClassName = tmp
-				//講師の時
-			} else if i%3 == 1 {
-				//TrimSpaceとかじゃきかない
-				k.Instructor = strings.Split(tmp, " ")[0] + strings.Split(tmp, " ")[4]
-			}
-		}
-
-		//休講理由
-		rawReason := strings.Split(s.Find("td.style3").Text(), "&")[0]
-		reason, _ := iconv.ConvertString(rawReason, "shift-jis", "utf-8")
-		k.Reason = strings.Split(reason, "ﾂ")[0]
-
-		rawPlaceDayWeek := doc.Find("tr.styleT > th").Text()
-		//Place
-		rawPlace := strings.Split(strings.Split(rawPlaceDayWeek, "[")[1], "]")[0]
-		place, _ := iconv.ConvertString(rawPlace, "shift-jis", "utf-8")
-		if place == "今出川" {
-			k.Place = 1
-		} else if place == "京田辺" {
-			k.Place = 2
-		}
-
-		//日付と曜日取らないといけない
-
+	for i, _ := range periods {
+		k := model.KyukoData{}
+		k.Period = periods[i]
+		k.Reason = reasons[i]
+		k.ClassName = names[i]
+		k.Instructor = instructors[i]
+		k.Weekday = weekday
+		k.Place = place
+		k.Day = day
 		kyukoData = append(kyukoData, k)
-	})
+	}
 
 	return kyukoData, err
 }
-*/
