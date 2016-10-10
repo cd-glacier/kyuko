@@ -69,6 +69,10 @@ func TestSetUrl(t *testing.T) {
 	if url, err := SetUrl(1, 7); err == nil {
 		t.Fatalf("日曜日のurlは必要ありません\n created url: %s", url)
 	}
+}
+
+//////////////////////////
+func TestGet(t *testing.T) {
 
 }
 
@@ -121,6 +125,65 @@ func TestScrapeReason(t *testing.T) {
 
 }
 
+func TestScrapeDay(t *testing.T) {
+	day, err := ScrapeDay(kyukoDoc)
+	if err != nil {
+		t.Fatalf("日付を取得できませんでした\n%s", err)
+	}
+
+	testData := "2016/10/10"
+	if day != testData {
+		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", testData, day)
+	}
+
+}
+
+func TestScrapePlace(t *testing.T) {
+	place, err := ScrapePlace(kyukoDoc)
+	if err != nil {
+		t.Fatalf("placeを取得できませんでした\n%s", err)
+	}
+
+	testData := 2
+	if place != testData {
+		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", testData, place)
+	}
+
+	place, err = ScrapePlace(noKyukoDoc)
+	if err != nil {
+		t.Fatalf("placeを取得できませんでした\n%s", err)
+	}
+
+	testData = 1
+	if place != testData {
+		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", testData, place)
+	}
+
+}
+
+func TestScrapeWeeday(t *testing.T) {
+	weekday, err := ScrapeWeekday(kyukoDoc)
+	if err != nil {
+		t.Fatalf("曜日をスクレイピングできませんでした\n%s", err)
+	}
+
+	testData := 1
+	if weekday != testData {
+		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", testData, weekday)
+	}
+
+	weekday, err = ScrapeWeekday(noKyukoDoc)
+	if err != nil {
+		t.Fatalf("曜日をスクレイピングできませんでした\n%s", err)
+	}
+
+	testData = 6
+	if weekday != testData {
+		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", testData, weekday)
+	}
+
+}
+
 func TestScrapeNameAndInstructor(t *testing.T) {
 	names, instructors, err := ScrapeNameAndInstructor(kyukoDoc)
 	if err != nil {
@@ -139,7 +202,7 @@ func TestScrapeNameAndInstructor(t *testing.T) {
 
 	names, instructors, err = ScrapeNameAndInstructor(noKyukoDoc)
 	if err != nil {
-		t.Fatal("periodをスクレイピングできませんでした\n%s", err)
+		t.Fatalf("periodをスクレイピングできませんでした\n%s", err)
 	}
 	if len(names) != 0 {
 		t.Fatalf("取得した結果が求めるものと違ったようです\ngot:  %v", names)
@@ -150,23 +213,9 @@ func TestScrapeNameAndInstructor(t *testing.T) {
 
 }
 
-//まだできてない
-func testScrape(t *testing.T) {
-
-	//r, err := Scrape("http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=4&kouchi=2")
-
-	/*
-		file, err := os.Open("../testdata/kyuko.html")
-		if err != nil {
-			t.Fatalf("テストデータを開けませんでした\n%s", err)
-		}
-		defer file.Close()
-
-		r, err := Scrape("", file)
-		if err != nil {
-			t.Fatalf("hoge\n%s", err)
-		}
-
-		fmt.Printf("%d\nhoge\n%d", r, err)
-	*/
+func TestScrape(t *testing.T) {
+	_, err := Scrape(kyukoDoc)
+	if err != nil {
+		t.Fatal("scrapingに失敗しました\n%s", err)
+	}
 }
