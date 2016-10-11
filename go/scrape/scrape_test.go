@@ -11,14 +11,56 @@ import (
 	"golang.org/x/text/transform"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/g-hyoga/kyuko/go/model"
 )
 
 var kyukoDoc, noKyukoDoc *goquery.Document
+var testPeriods []int
+var testReasons, testNames, testInstructors []string
+var testPlace, testWeekday int
+var testDay string
+var testData []model.KyukoData
+var noTestPlace, noTestWeekday int
+var noTestDay string
+var noTestData []model.KyukoData
 
 const (
 	KYUKOFILE   = "../testdata/kyuko.html"
 	NOKYUKOFILE = "../testdata/not_kyuko.html"
 )
+
+func init() {
+	//休講ある
+	kyukoReader, _ := EncodeTestFile(KYUKOFILE)
+	kyukoDoc, _ = goquery.NewDocumentFromReader(kyukoReader)
+
+	testPeriods = []int{2, 2, 2, 5}
+	testReasons = []string{"公務", "出張", "公務", ""}
+	testNames = []string{"環境生理学", "電気・電子計測Ｉ－１", "応用数学ＩＩ－１", "イングリッシュ・セミナー２－７０２"}
+	testInstructors = []string{"福岡義之", "松川真美", "大川領", "稲垣俊史"}
+	testPlace = 2
+	testDay = "2016/10/10"
+	testWeekday = 1
+
+	for i, _ := range testPeriods {
+		k := model.KyukoData{}
+		k.Period = testPeriods[i]
+		k.Reason = testReasons[i]
+		k.ClassName = testNames[i]
+		k.Instructor = testInstructors[i]
+		k.Weekday = testWeekday
+		k.Place = testPlace
+		k.Day = testDay
+		testData = append(testData, k)
+	}
+
+	//休講ない
+	noKyukoReader, _ := EncodeTestFile(NOKYUKOFILE)
+	noKyukoDoc, _ = goquery.NewDocumentFromReader(noKyukoReader)
+
+	noTestPlace = 1
+	noTestWeekday = 6
+}
 
 func SjisToUtf8(str string) (string, error) {
 	ret, err := ioutil.ReadAll(transform.NewReader(strings.NewReader(str), japanese.ShiftJIS.NewDecoder()))
@@ -41,16 +83,6 @@ func EncodeTestFile(fileName string) (io.Reader, error) {
 	stringReader := strings.NewReader(utfFile)
 
 	return stringReader, nil
-}
-
-func init() {
-	//休講ある
-	kyukoReader, _ := EncodeTestFile(KYUKOFILE)
-	kyukoDoc, _ = goquery.NewDocumentFromReader(kyukoReader)
-
-	//休講ない
-	noKyukoReader, _ := EncodeTestFile(NOKYUKOFILE)
-	noKyukoDoc, _ = goquery.NewDocumentFromReader(noKyukoReader)
 }
 
 func TestSetUrl(t *testing.T) {
@@ -82,9 +114,8 @@ func TestScrapePeriod(t *testing.T) {
 		t.Fatal("periodをスクレイピングできませんでした\n%s", err)
 	}
 
-	testSlice := []int{2, 2, 2, 5}
-	if !reflect.DeepEqual(periods, testSlice) {
-		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %d\n got:  %d", testSlice, periods)
+	if !reflect.DeepEqual(periods, testPeriods) {
+		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %d\n got:  %d", testPeriods, periods)
 	}
 
 	periods, err = ScrapePeriod(noKyukoDoc)
@@ -110,9 +141,8 @@ func TestScrapeReason(t *testing.T) {
 		t.Fatalf("reasonをスクレイピングできませんでした\n%s", err)
 	}
 
-	testSlice := []string{"公務", "出張", "公務", ""}
-	if !reflect.DeepEqual(reasons, testSlice) {
-		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testSlice, reasons)
+	if !reflect.DeepEqual(reasons, testReasons) {
+		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testReasons, reasons)
 	}
 
 	reasons, err = ScrapeReason(noKyukoDoc)
@@ -131,9 +161,8 @@ func TestScrapeDay(t *testing.T) {
 		t.Fatalf("日付を取得できませんでした\n%s", err)
 	}
 
-	testData := "2016/10/10"
-	if day != testData {
-		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", testData, day)
+	if day != testDay {
+		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", testDay, day)
 	}
 
 }
@@ -144,9 +173,9 @@ func TestScrapePlace(t *testing.T) {
 		t.Fatalf("placeを取得できませんでした\n%s", err)
 	}
 
-	testData := 2
-	if place != testData {
-		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", testData, place)
+	testPlace := 2
+	if place != testPlace {
+		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", testPlace, place)
 	}
 
 	place, err = ScrapePlace(noKyukoDoc)
@@ -154,9 +183,8 @@ func TestScrapePlace(t *testing.T) {
 		t.Fatalf("placeを取得できませんでした\n%s", err)
 	}
 
-	testData = 1
-	if place != testData {
-		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", testData, place)
+	if place != noTestPlace {
+		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", noTestPlace, place)
 	}
 
 }
@@ -167,9 +195,8 @@ func TestScrapeWeeday(t *testing.T) {
 		t.Fatalf("曜日をスクレイピングできませんでした\n%s", err)
 	}
 
-	testData := 1
-	if weekday != testData {
-		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", testData, weekday)
+	if weekday != testWeekday {
+		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", testWeekday, weekday)
 	}
 
 	weekday, err = ScrapeWeekday(noKyukoDoc)
@@ -177,9 +204,8 @@ func TestScrapeWeeday(t *testing.T) {
 		t.Fatalf("曜日をスクレイピングできませんでした\n%s", err)
 	}
 
-	testData = 6
-	if weekday != testData {
-		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", testData, weekday)
+	if weekday != noTestWeekday {
+		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", noTestWeekday, weekday)
 	}
 
 }
@@ -190,14 +216,12 @@ func TestScrapeNameAndInstructor(t *testing.T) {
 		t.Fatalf("Nameのスクレイピングに失敗したようです\n%s", err)
 	}
 
-	testSlice := []string{"環境生理学", "電気・電子計測Ｉ－１", "応用数学ＩＩ－１", "イングリッシュ・セミナー２－７０２"}
-	if !reflect.DeepEqual(names, testSlice) {
-		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testSlice, names)
+	if !reflect.DeepEqual(names, testNames) {
+		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testNames, names)
 	}
 
-	testSlice = []string{"福岡義之", "松川真美", "大川領", "稲垣俊史"}
-	if !reflect.DeepEqual(instructors, testSlice) {
-		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testSlice, instructors)
+	if !reflect.DeepEqual(instructors, testInstructors) {
+		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testInstructors, instructors)
 	}
 
 	names, instructors, err = ScrapeNameAndInstructor(noKyukoDoc)
@@ -214,7 +238,16 @@ func TestScrapeNameAndInstructor(t *testing.T) {
 }
 
 func TestScrape(t *testing.T) {
-	_, err := Scrape(kyukoDoc)
+	allData, err := Scrape(kyukoDoc)
+	if err != nil {
+		t.Fatal("scrapingに失敗しました\n%s", err)
+	}
+
+	if !reflect.DeepEqual(allData, testData) {
+		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testData, allData)
+	}
+
+	allData, err = Scrape(noKyukoDoc)
 	if err != nil {
 		t.Fatal("scrapingに失敗しました\n%s", err)
 	}
