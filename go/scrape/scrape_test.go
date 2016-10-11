@@ -251,12 +251,3 @@ func TestScrape(t *testing.T) {
 		t.Fatal("scrapingに失敗しました\n%s", err)
 	}
 }
-
-func BenchmarkScrape(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_, err := Scrape(kyukoDoc)
-		if err != nil {
-			b.Fatal(err)
-		}
-	}
-}
