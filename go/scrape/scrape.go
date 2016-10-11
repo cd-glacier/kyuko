@@ -165,12 +165,40 @@ func Scrape(doc *goquery.Document) ([]model.KyukoData, error) {
 	var kyukoData []model.KyukoData
 	var err error
 
-	periods, err := ScrapePeriod(doc)
-	reasons, err := ScrapeReason(doc)
-	names, instructors, err := ScrapeNameAndInstructor(doc)
-	weekday, err := ScrapeWeekday(doc)
-	day, err := ScrapeDay(doc)
-	place, err := ScrapePlace(doc)
+	var periods []int
+	var reasons, names, instructors []string
+	var weekday, place int
+	var day string
+
+	finished := make(chan bool)
+	go func() {
+		periods, err = ScrapePeriod(doc)
+		finished <- true
+	}()
+	go func() {
+		reasons, err = ScrapeReason(doc)
+		finished <- true
+	}()
+	go func() {
+		names, instructors, err = ScrapeNameAndInstructor(doc)
+		finished <- true
+	}()
+	go func() {
+		weekday, err = ScrapeWeekday(doc)
+		finished <- true
+	}()
+	go func() {
+		day, err = ScrapeDay(doc)
+		finished <- true
+	}()
+	go func() {
+		place, err = ScrapePlace(doc)
+		finished <- true
+	}()
+	for i := 1; i <= 6; i++ {
+		<-finished
+	}
+
 	if err != nil {
 		return nil, err
 	}
