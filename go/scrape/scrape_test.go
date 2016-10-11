@@ -173,7 +173,6 @@ func TestScrapePlace(t *testing.T) {
 		t.Fatalf("placeを取得できませんでした\n%s", err)
 	}
 
-	testPlace := 2
 	if place != testPlace {
 		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", testPlace, place)
 	}
