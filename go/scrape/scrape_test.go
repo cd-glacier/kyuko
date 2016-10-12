@@ -129,13 +129,6 @@ func TestScrapePeriod(t *testing.T) {
 
 func TestScrapeReason(t *testing.T) {
 
-	/*
-		//httpでやるとき
-			stringReader, err := Get("http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=2&kouchi=2")
-			if err != nil {
-				t.Fatal("hoge\n%v", err)
-			}
-	*/
 	reasons, err := ScrapeReason(kyukoDoc)
 	if err != nil {
 		t.Fatalf("reasonをスクレイピングできませんでした\n%s", err)
