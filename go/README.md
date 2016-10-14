@@ -1,5 +1,7 @@
 # GO TO GO
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/g-hyoga/kyuko)](https://goreportcard.com/report/github.com/g-hyoga/kyuko)
+
 ## kyuko.go
 他のgoファイルを呼び出す
 
