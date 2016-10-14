@@ -8,11 +8,10 @@ import (
 	"strconv"
 	"strings"
 
-	"golang.org/x/text/encoding/japanese"
-	"golang.org/x/text/transform"
-
 	"github.com/PuerkitoBio/goquery"
 	"github.com/g-hyoga/kyuko/go/model"
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 )
 
 //place(1: 今出川 ,2: 京田辺), week(1 ~ 6: Mon ~ Sat)を引数に持ち
@@ -207,7 +206,7 @@ func Scrape(doc *goquery.Document) ([]model.KyukoData, error) {
 		return nil, errors.New("取得できていない情報があります")
 	}
 
-	for i, _ := range periods {
+	for i := range periods {
 		k := model.KyukoData{}
 		k.Period = periods[i]
 		k.Reason = reasons[i]

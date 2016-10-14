@@ -7,11 +7,10 @@ import (
 	"strings"
 	"testing"
 
-	"golang.org/x/text/encoding/japanese"
-	"golang.org/x/text/transform"
-
 	"github.com/PuerkitoBio/goquery"
 	"github.com/g-hyoga/kyuko/go/model"
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 )
 
 var kyukoDoc, noKyukoDoc *goquery.Document
@@ -42,7 +41,7 @@ func init() {
 	testDay = "2016/10/10"
 	testWeekday = 1
 
-	for i, _ := range testPeriods {
+	for i := range testPeriods {
 		k := model.KyukoData{}
 		k.Period = testPeriods[i]
 		k.Reason = testReasons[i]
