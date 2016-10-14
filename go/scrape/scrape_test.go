@@ -110,7 +110,7 @@ func TestGet(t *testing.T) {
 func TestScrapePeriod(t *testing.T) {
 	periods, err := ScrapePeriod(kyukoDoc)
 	if err != nil {
-		t.Fatal("periodをスクレイピングできませんでした\n%s", err)
+		t.Fatalf("periodをスクレイピングできませんでした\n%s", err)
 	}
 
 	if !reflect.DeepEqual(periods, testPeriods) {
@@ -119,7 +119,7 @@ func TestScrapePeriod(t *testing.T) {
 
 	periods, err = ScrapePeriod(noKyukoDoc)
 	if err != nil {
-		t.Fatal("periodをスクレイピングできませんでした\n%s", err)
+		t.Fatalf("periodをスクレイピングできませんでした\n%s", err)
 	}
 	if len(periods) != 0 {
 		t.Fatalf("取得した結果が求めるものと違ったようです\ngot:  %v", periods)
@@ -146,7 +146,7 @@ func TestScrapeReason(t *testing.T) {
 
 	reasons, err = ScrapeReason(noKyukoDoc)
 	if err != nil {
-		t.Fatal("periodをスクレイピングできませんでした\n%s", err)
+		t.Fatalf("periodをスクレイピングできませんでした\n%s", err)
 	}
 	if len(reasons) != 0 {
 		t.Fatalf("取得した結果が求めるものと違ったようです\ngot:  %v", reasons)
@@ -238,7 +238,7 @@ func TestScrapeNameAndInstructor(t *testing.T) {
 func TestScrape(t *testing.T) {
 	allData, err := Scrape(kyukoDoc)
 	if err != nil {
-		t.Fatal("scrapingに失敗しました\n%s", err)
+		t.Fatalf("scrapingに失敗しました\n%s", err)
 	}
 
 	if !reflect.DeepEqual(allData, testData) {
@@ -247,7 +247,7 @@ func TestScrape(t *testing.T) {
 
 	allData, err = Scrape(noKyukoDoc)
 	if err != nil {
-		t.Fatal("scrapingに失敗しました\n%s", err)
+		t.Fatalf("scrapingに失敗しました\n%s", err)
 	}
 }
 
