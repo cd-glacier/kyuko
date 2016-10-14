@@ -250,3 +250,51 @@ func TestScrape(t *testing.T) {
 		t.Fatal("scrapingに失敗しました\n%s", err)
 	}
 }
+
+func BenchmarkScrape(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Scrape(kyukoDoc)
+	}
+}
+
+func BenchmarkSetUrl(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		SetUrl(1, 1)
+	}
+}
+
+func BenchmarkScrapeDay(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ScrapeDay(kyukoDoc)
+	}
+}
+
+func BenchmarkScrapeNameAndInstructor(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ScrapeNameAndInstructor(kyukoDoc)
+	}
+}
+
+func BenchmarkScrapePeriod(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ScrapePeriod(kyukoDoc)
+	}
+}
+
+func BenchmarkScrapePlace(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ScrapePeriod(kyukoDoc)
+	}
+}
+
+func BenchmarkScrapeReason(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ScrapeReason(kyukoDoc)
+	}
+}
+
+func BenchmarkScrapeWeekday(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ScrapeWeekday(kyukoDoc)
+	}
+}
