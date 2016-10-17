@@ -7,11 +7,10 @@ import (
 	"strings"
 	"testing"
 
-	"golang.org/x/text/encoding/japanese"
-	"golang.org/x/text/transform"
-
 	"github.com/PuerkitoBio/goquery"
 	"github.com/g-hyoga/kyuko/go/model"
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 )
 
 var kyukoDoc, noKyukoDoc *goquery.Document
@@ -42,7 +41,7 @@ func init() {
 	testDay = "2016/10/10"
 	testWeekday = 1
 
-	for i, _ := range testPeriods {
+	for i := range testPeriods {
 		k := model.KyukoData{}
 		k.Period = testPeriods[i]
 		k.Reason = testReasons[i]
@@ -111,7 +110,7 @@ func TestGet(t *testing.T) {
 func TestScrapePeriod(t *testing.T) {
 	periods, err := ScrapePeriod(kyukoDoc)
 	if err != nil {
-		t.Fatal("periodをスクレイピングできませんでした\n%s", err)
+		t.Fatalf("periodをスクレイピングできませんでした\n%s", err)
 	}
 
 	if !reflect.DeepEqual(periods, testPeriods) {
@@ -120,7 +119,7 @@ func TestScrapePeriod(t *testing.T) {
 
 	periods, err = ScrapePeriod(noKyukoDoc)
 	if err != nil {
-		t.Fatal("periodをスクレイピングできませんでした\n%s", err)
+		t.Fatalf("periodをスクレイピングできませんでした\n%s", err)
 	}
 	if len(periods) != 0 {
 		t.Fatalf("取得した結果が求めるものと違ったようです\ngot:  %v", periods)
@@ -147,7 +146,7 @@ func TestScrapeReason(t *testing.T) {
 
 	reasons, err = ScrapeReason(noKyukoDoc)
 	if err != nil {
-		t.Fatal("periodをスクレイピングできませんでした\n%s", err)
+		t.Fatalf("periodをスクレイピングできませんでした\n%s", err)
 	}
 	if len(reasons) != 0 {
 		t.Fatalf("取得した結果が求めるものと違ったようです\ngot:  %v", reasons)
@@ -239,7 +238,7 @@ func TestScrapeNameAndInstructor(t *testing.T) {
 func TestScrape(t *testing.T) {
 	allData, err := Scrape(kyukoDoc)
 	if err != nil {
-		t.Fatal("scrapingに失敗しました\n%s", err)
+		t.Fatalf("scrapingに失敗しました\n%s", err)
 	}
 
 	if !reflect.DeepEqual(allData, testData) {
@@ -248,6 +247,54 @@ func TestScrape(t *testing.T) {
 
 	allData, err = Scrape(noKyukoDoc)
 	if err != nil {
-		t.Fatal("scrapingに失敗しました\n%s", err)
+		t.Fatalf("scrapingに失敗しました\n%s", err)
+	}
+}
+
+func BenchmarkScrape(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Scrape(kyukoDoc)
+	}
+}
+
+func BenchmarkSetUrl(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		SetUrl(1, 1)
+	}
+}
+
+func BenchmarkScrapeDay(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ScrapeDay(kyukoDoc)
+	}
+}
+
+func BenchmarkScrapeNameAndInstructor(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ScrapeNameAndInstructor(kyukoDoc)
+	}
+}
+
+func BenchmarkScrapePeriod(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ScrapePeriod(kyukoDoc)
+	}
+}
+
+func BenchmarkScrapePlace(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ScrapePeriod(kyukoDoc)
+	}
+}
+
+func BenchmarkScrapeReason(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ScrapeReason(kyukoDoc)
+	}
+}
+
+func BenchmarkScrapeWeekday(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ScrapeWeekday(kyukoDoc)
 	}
 }
