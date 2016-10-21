@@ -65,4 +65,13 @@ func TestConvertWeekItos(t *testing.T) {
 	if weekday, err := ConvertWeekItos(6); weekday != "土" || err != nil {
 		t.Fatalf("曜日のconvertに失敗しました\nwant: 土\ngot:  %s\nerror:", weekday, err)
 	}
+	if _, err := ConvertWeekItos(7); err == nil {
+		t.Fatalf("存在しない曜日でconvertできています\nerror:", err)
+	}
+}
+
+func TestCreateContent(t *testing.T) {
+	// 140文字を超えさせるためにtestDataを二回適用している
+	test := "月曜日の休講情報\n2限:環境生理学(福岡義之)\n2限:電気・電子計測Ｉ－１(松川真美)\n2限:応用数学ＩＩ－１(大川領)\n5限:イングリッシュ・セミナー２－７０２(稲垣俊史)\n2限:環境生理学(福岡義之)\n2限:電気・電子計測Ｉ－１(松川真美)\n"
+
 }
