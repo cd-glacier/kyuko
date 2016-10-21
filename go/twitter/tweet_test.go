@@ -71,7 +71,20 @@ func TestConvertWeekItos(t *testing.T) {
 }
 
 func TestCreateContent(t *testing.T) {
+	testContents := []string{"月曜日の休講情報\n2限:環境生理学(福岡義之)\n2限:電気・電子計測Ｉ－１(松川真美)\n2限:応用数学ＩＩ－１(大川領)\n5限:イングリッシュ・セミナー２－７０２(稲垣俊史)\n2限:環境生理学(福岡義之)\n2限:電気・電子計測Ｉ－１(松川真美)\n2限:応用数学ＩＩ－１(大川領)\n", "月曜日の休講情報\n5限:イングリッシュ・セミナー２－７０２(稲垣俊史)\n"}
+
 	// 140文字を超えさせるためにtestDataを二回適用している
-	test := "月曜日の休講情報\n2限:環境生理学(福岡義之)\n2限:電気・電子計測Ｉ－１(松川真美)\n2限:応用数学ＩＩ－１(大川領)\n5限:イングリッシュ・セミナー２－７０２(稲垣俊史)\n2限:環境生理学(福岡義之)\n2限:電気・電子計測Ｉ－１(松川真美)\n"
+	testData = append(testData, testData...)
+
+	contents, err := CreateContent(testData)
+	if err != nil {
+		t.Fatalf("CreateContentでエラー\nerr: %s", err)
+	}
+
+	for i, content := range contents {
+		if content != testContents[i] {
+			t.Fatalf("tweetを140文字以内に収めるの失敗\nwant: %s\ngot:  %s", testContents[i], content)
+		}
+	}
 
 }

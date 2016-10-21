@@ -88,14 +88,16 @@ func CreateContent(kyuko []model.KyukoData) ([]string, error) {
 	// create content
 	tw := KANJIweekday + "曜日の休講情報\n"
 	for _, line := range lines {
-		if len([]rune(line)) < 140 {
+		if len([]rune(tw+line)) > 140 {
+			tws = append(tws, tw)
+			tw = ""
+			tw = KANJIweekday + "曜日の休講情報\n"
 			tw = tw + line
 		} else {
-			tws = append(tws, tw)
-			tw = KANJIweekday + "曜日の休講情報\n"
 			tw = tw + line
 		}
 	}
+	tws = append(tws, tw)
 
 	return tws, err
 }
