@@ -1,12 +1,14 @@
 package twitter
 
 import (
+	"errors"
 	"fmt"
-	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
+	"github.com/g-hyoga/kyuko/go/model"
 )
 
 var (
@@ -29,6 +31,21 @@ func init() {
 	token := oauth1.NewToken(T_ACCESS_TOKEN, T_ACCESS_TOKEN_SECRET)
 	httpClient := config.Client(oauth1.NoContext, token)
 	tClient = *twitter.NewClient(httpClient)
+}
+
+// template
+// className(Instructor)
+func CreateLine(kyuko model.KyukoData) (string, error) {
+	if kyuko.ClassName == "" || kyuko.Instructor == "" || kyuko.Period == 0 {
+		return "", errors.New("休講情報がないです")
+	}
+
+	fmt.Printf("hogehoge%s\n", kyuko.Period)
+
+	period := strconv.Itoa(kyuko.Period)
+
+	line := period + "限:" + kyuko.ClassName + "(" + kyuko.Instructor + ")\n"
+	return line, nil
 }
 
 // tweet argment
