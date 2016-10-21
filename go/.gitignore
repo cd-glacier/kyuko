@@ -1,2 +1,4 @@
 *.swp
 cmd/main
+Godeps/Readme
+Godeps/_workspace
