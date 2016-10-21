@@ -34,8 +34,15 @@ func init() {
 	}
 }
 
+// どうやってテストしよう
 func testUpdate(t *testing.T) {
-	err := Update("test")
+	var err error
+	err = Update(tClient, "test")
+	if err != nil {
+		t.Fatalf("tweetに失敗しました\nerr: %s", err)
+	}
+
+	err = Update(iClient, "test")
 	if err != nil {
 		t.Fatalf("tweetに失敗しました\nerr: %s", err)
 	}
