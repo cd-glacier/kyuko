@@ -45,6 +45,35 @@ func CreateLine(kyuko model.KyukoData) (string, error) {
 	return line, nil
 }
 
+// create tweet template
+// exsample
+//
+// hoge曜日の休講情報
+// period:className(Instructor)
+// period:className(Instructor)
+// ...
+//
+// in 140 characters
+func CreateContent(kyuko []model.KyukoDara) ([]string, error) {
+	var tws []string
+
+	var lines []string
+	for _, v := range kyuko {
+		line, err := CreateLine(v)
+		if err != nil {
+			return tws, err
+		}
+		lines = append(lines, line)
+	}
+
+	weekday := kyuko[0].Weekday
+	stringWeekday := time.Weekday(weekday)
+	tw := "曜日の休講情報\n"
+	for i, v := range lines {
+
+	}
+}
+
 // tweet argment
 func Update(text string) error {
 	_, _, err := tClient.Statuses.Update(text, nil)
