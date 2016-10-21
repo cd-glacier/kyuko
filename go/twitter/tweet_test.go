@@ -66,14 +66,14 @@ func TestCreateLine(t *testing.T) {
 
 func TestConvertWeekItos(t *testing.T) {
 	if weekday, err := ConvertWeekItos(1); weekday != "月" || err != nil {
-		t.Fatalf("曜日のconvertに失敗しました\nwant: 月\ngot:  %s\nerror:%s", weekday, err)
+		t.Fatalf("曜日のconvertに失敗しました\nwant: 月\ngot: %s\nerror: %s", weekday, err)
 	}
 
 	if weekday, err := ConvertWeekItos(6); weekday != "土" || err != nil {
-		t.Fatalf("曜日のconvertに失敗しました\nwant: 土\ngot:  %s\nerror:", weekday, err)
+		t.Fatalf("曜日のconvertに失敗しました\nwant: 土\ngot: %s\nerror: %s", weekday, err)
 	}
 	if _, err := ConvertWeekItos(7); err == nil {
-		t.Fatalf("存在しない曜日でconvertできています\nerror:", err)
+		t.Fatalf("存在しない曜日でconvertできています\nerror: %s", err)
 	}
 }
 
