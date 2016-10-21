@@ -23,6 +23,7 @@ var (
 )
 
 var tClient twitter.Client
+var iClient twitter.Client
 
 func init() {
 	//京田辺
@@ -30,6 +31,12 @@ func init() {
 	token := oauth1.NewToken(T_ACCESS_TOKEN, T_ACCESS_TOKEN_SECRET)
 	httpClient := config.Client(oauth1.NoContext, token)
 	tClient = *twitter.NewClient(httpClient)
+
+	//今出川
+	config = oauth1.NewConfig(I_CONSUMER_KEY, I_CONSUMER_SECRET)
+	token = oauth1.NewToken(I_ACCESS_TOKEN, I_ACCESS_TOKEN_SECRET)
+	httpClient = config.Client(oauth1.NoContext, token)
+	iClient = *twitter.NewClient(httpClient)
 }
 
 // create line of template
@@ -103,11 +110,10 @@ func CreateContent(kyuko []model.KyukoData) ([]string, error) {
 }
 
 // tweet argment
-func Update(text string) error {
-	_, _, err := tClient.Statuses.Update(text, nil)
+func Update(client twitter.Client, text string) error {
+	_, _, err := client.Statuses.Update(text, nil)
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
