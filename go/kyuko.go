@@ -1,8 +1,6 @@
 package kyuko
 
 import (
-	"fmt"
-
 	"github.com/PuerkitoBio/goquery"
 	"github.com/g-hyoga/kyuko/go/model"
 	"github.com/g-hyoga/kyuko/go/scrape"
@@ -32,7 +30,6 @@ func Exec() error {
 
 	kyukoData, err := scrape.Scrape(doc)
 	if err != nil {
-		fmt.Print("hogehogehoge\n")
 		return err
 	}
 
@@ -48,7 +45,6 @@ func Exec() error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("%s\n", data)
 	}
 
 	return nil
