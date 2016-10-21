@@ -2,7 +2,6 @@ package twitter
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"strconv"
 
@@ -33,14 +32,12 @@ func init() {
 	tClient = *twitter.NewClient(httpClient)
 }
 
-// template
-// className(Instructor)
+// create line of template
+// period:className(Instructor)
 func CreateLine(kyuko model.KyukoData) (string, error) {
 	if kyuko.ClassName == "" || kyuko.Instructor == "" || kyuko.Period == 0 {
 		return "", errors.New("休講情報がないです")
 	}
-
-	fmt.Printf("hogehoge%s\n", kyuko.Period)
 
 	period := strconv.Itoa(kyuko.Period)
 
