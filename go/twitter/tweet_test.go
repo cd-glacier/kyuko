@@ -81,9 +81,9 @@ func TestCreateContent(t *testing.T) {
 	testContents := []string{"月曜日の休講情報\n2限:環境生理学(福岡義之)\n2限:電気・電子計測Ｉ－１(松川真美)\n2限:応用数学ＩＩ－１(大川領)\n5限:イングリッシュ・セミナー２－７０２(稲垣俊史)\n2限:環境生理学(福岡義之)\n2限:電気・電子計測Ｉ－１(松川真美)\n2限:応用数学ＩＩ－１(大川領)\n", "月曜日の休講情報\n5限:イングリッシュ・セミナー２－７０２(稲垣俊史)\n"}
 
 	// 140文字を超えさせるためにtestDataを二回適用している
-	testData = append(testData, testData...)
+	testDataBig := append(testData, testData...)
 
-	contents, err := CreateContent(testData)
+	contents, err := CreateContent(testDataBig)
 	if err != nil {
 		t.Fatalf("CreateContentでエラー\nerr: %s", err)
 	}
@@ -94,4 +94,22 @@ func TestCreateContent(t *testing.T) {
 		}
 	}
 
+}
+
+func BenchmarkCreateLine(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		CreateLine(testData[0])
+	}
+}
+
+func BenchmarkConvertWeekItos(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ConvertWeekItos(1)
+	}
+}
+
+func BenchmarkCreateContent(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		CreateContent(testData)
+	}
 }
