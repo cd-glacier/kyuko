@@ -22,21 +22,23 @@ var (
 	I_ACCESS_TOKEN_SECRET = os.Getenv("I_ACCESS_TOKEN_SECRET")
 )
 
-var tClient twitter.Client
-var iClient twitter.Client
+var tClient *twitter.Client
+var iClient *twitter.Client
 
 func init() {
 	//京田辺
-	config := oauth1.NewConfig(T_CONSUMER_KEY, T_CONSUMER_SECRET)
-	token := oauth1.NewToken(T_ACCESS_TOKEN, T_ACCESS_TOKEN_SECRET)
-	httpClient := config.Client(oauth1.NoContext, token)
-	tClient = *twitter.NewClient(httpClient)
+	tClient = newTwitterClient(T_CONSUMER_KEY, T_CONSUMER_SECRET, T_ACCESS_TOKEN, T_ACCESS_TOKEN_SECRET)
 
 	//今出川
-	config = oauth1.NewConfig(I_CONSUMER_KEY, I_CONSUMER_SECRET)
-	token = oauth1.NewToken(I_ACCESS_TOKEN, I_ACCESS_TOKEN_SECRET)
-	httpClient = config.Client(oauth1.NoContext, token)
-	iClient = *twitter.NewClient(httpClient)
+	iClient = newTwitterClient(I_CONSUMER_KEY, I_CONSUMER_SECRET, I_ACCESS_TOKEN, I_ACCESS_TOKEN_SECRET)
+}
+
+// newTwitterClient returns a new Twitter Client
+func newTwitterClient(consumerKey, consumerSecret, token, tokenSecret string) *twitter.Client {
+	config := oauth1.NewConfig(consumerKey, consumerSecret)
+	oauthToken := oauth1.NewToken(token, tokenSecret)
+	httpClient := config.Client(oauth1.NoContext, oauthToken)
+	return twitter.NewClient(httpClient)
 }
 
 // create line of template
@@ -110,7 +112,7 @@ func CreateContent(kyuko []model.KyukoData) ([]string, error) {
 }
 
 // tweet argment
-func Update(client twitter.Client, text string) error {
+func Update(client *twitter.Client, text string) error {
 	_, _, err := client.Statuses.Update(text, nil)
 	if err != nil {
 		return err
