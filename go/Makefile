@@ -4,17 +4,15 @@ ENV:=development
 
 setup:
 	go get github.com/tools/godep
-	go get github.com/rubenv/sql-migrate/...
-	go get github.com/PuerkitoBio/goquery
-	go get golang.org/x/text/encoding/japanese
-	go get golang.org/x/text/transform
-
 
 build:
-	go build -o cmd/main cmd/main.go
+	godep go build -o cmd/main cmd/main.go
 
 run:
 	./cmd/main
+
+test:
+	godep go test -v ./...
 
 test/init:
 	mysql -u root -h localhost --protocol tcp -e "create database \`$(TESTDB)\`" -p
