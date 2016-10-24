@@ -14,6 +14,12 @@ import (
 	"golang.org/x/text/transform"
 )
 
+var stringCleaner *strings.Replacer
+
+func init() {
+	stringCleaner = strings.NewReplacer(" ", "", "\n", "", "\u00a0", "")
+}
+
 //place(1: 今出川 ,2: 京田辺), week(1 ~ 6: Mon ~ Sat)を引数に持ち
 //urlを生成する
 func SetUrl(place, week int) (string, error) {
@@ -74,9 +80,7 @@ func ScrapeReason(doc *goquery.Document) ([]string, error) {
 
 	doc.Find("tr.style1").Each(func(i int, s *goquery.Selection) {
 		reason := s.Find("td.style3").Text()
-		reason = strings.Replace(reason, "\n", "", -1)
-		reason = strings.Replace(reason, " ", "", -1)
-		reason = strings.Replace(reason, "\u00a0", "", -1)
+		reason = stringCleaner.Replace(reason)
 		reasons = append(reasons, reason)
 	})
 
@@ -107,9 +111,7 @@ func ScrapeDay(doc *goquery.Document) (string, error) {
 	day := doc.Find("tr.styleT > th").Text()
 	day = strings.Split(day, "]")[1]
 	day = strings.Split(day, "(")[0]
-	day = strings.Replace(day, " ", "", -1)
-	day = strings.Replace(day, "\n", "", -1)
-	day = strings.Replace(day, "\u00a0", "", -1)
+	day = stringCleaner.Replace(day)
 	year := strings.Split(day, "年")[0]
 	month := strings.Split(strings.Split(day, "年")[1], "月")[0]
 	date := strings.Split(strings.Split(day, "日")[0], "月")[1]
@@ -146,9 +148,7 @@ func ScrapeWeekday(doc *goquery.Document) (int, error) {
 	weekday := doc.Find("tr.styleT > th").Text()
 	weekday = strings.Split(weekday, "(")[1]
 	weekday = strings.Replace(weekday, ")", "", -1)
-	weekday = strings.Replace(weekday, " ", "", -1)
-	weekday = strings.Replace(weekday, "\n", "", -1)
-	weekday = strings.Replace(weekday, "\u00a0", "", -1)
+	weekday = stringCleaner.Replace(weekday)
 	youbi, err := ConvertWeekStoi(weekday)
 
 	if err != nil {
