@@ -4,6 +4,7 @@ ENV:=development
 
 setup:
 	go get github.com/tools/godep
+	godep get
 
 build:
 	godep go build -o cmd/main cmd/main.go
