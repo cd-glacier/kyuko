@@ -7,7 +7,6 @@ import (
 	goTwitter "github.com/dghubble/go-twitter/twitter"
 	"github.com/g-hyoga/kyuko/go/model"
 	"github.com/g-hyoga/kyuko/go/scrape"
-	"github.com/g-hyoga/kyuko/go/twitter"
 )
 
 // scrapingを実行してデータベースに保存する
@@ -65,14 +64,16 @@ func Exec(place int, client *goTwitter.Client) error {
 		}
 	}
 
-	tws, err := twitter.CreateContent(kyukoData)
-	if err != nil {
-		return err
-	}
+	/*
+		tws, err := twitter.CreateContent(kyukoData)
+		if err != nil {
+			return err
+		}
 
-	for _, tw := range tws {
-		twitter.Update(client, tw)
-	}
+		for _, tw := range tws {
+			twitter.Update(client, tw)
+		}
+	*/
 
 	return nil
 }
