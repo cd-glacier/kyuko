@@ -25,7 +25,7 @@ func Exec(place int, client *goTwitter.Client) error {
 	}
 	// 日曜なら月曜の情報にする
 	if weekday == 7 {
-		weekdat = 1
+		weekday = 1
 	}
 
 	//第一引数:校地
