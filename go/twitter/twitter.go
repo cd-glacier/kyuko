@@ -2,7 +2,6 @@ package twitter
 
 import (
 	"errors"
-	"os"
 	"strconv"
 
 	"github.com/dghubble/go-twitter/twitter"
@@ -10,31 +9,8 @@ import (
 	"github.com/g-hyoga/kyuko/go/model"
 )
 
-var (
-	T_CONSUMER_KEY        = os.Getenv("T_CONSUMER_KEY")
-	T_CONSUMER_SECRET     = os.Getenv("T_CONSUMER_SECRET")
-	T_ACCESS_TOKEN        = os.Getenv("T_ACCESS_TOKEN")
-	T_ACCESS_TOKEN_SECRET = os.Getenv("T_ACCESS_TOKEN_SECRET")
-
-	I_CONSUMER_KEY        = os.Getenv("I_CONSUMER_KEY")
-	I_CONSUMER_SECRET     = os.Getenv("I_CONSUMER_SECRET")
-	I_ACCESS_TOKEN        = os.Getenv("I_ACCESS_TOKEN")
-	I_ACCESS_TOKEN_SECRET = os.Getenv("I_ACCESS_TOKEN_SECRET")
-)
-
-var tClient *twitter.Client
-var iClient *twitter.Client
-
-func init() {
-	//京田辺
-	tClient = newTwitterClient(T_CONSUMER_KEY, T_CONSUMER_SECRET, T_ACCESS_TOKEN, T_ACCESS_TOKEN_SECRET)
-
-	//今出川
-	iClient = newTwitterClient(I_CONSUMER_KEY, I_CONSUMER_SECRET, I_ACCESS_TOKEN, I_ACCESS_TOKEN_SECRET)
-}
-
 // newTwitterClient returns a new Twitter Client
-func newTwitterClient(consumerKey, consumerSecret, token, tokenSecret string) *twitter.Client {
+func NewTwitterClient(consumerKey, consumerSecret, token, tokenSecret string) *twitter.Client {
 	config := oauth1.NewConfig(consumerKey, consumerSecret)
 	oauthToken := oauth1.NewToken(token, tokenSecret)
 	httpClient := config.Client(oauth1.NoContext, oauthToken)
