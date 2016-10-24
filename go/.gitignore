@@ -2,3 +2,4 @@
 cmd/main
 Godeps/Readme
 Godeps/_workspace
+vendor/

@@ -1,6 +1,7 @@
 package twitter
 
 import (
+	"os"
 	"testing"
 
 	"github.com/g-hyoga/kyuko/go/model"
@@ -11,6 +12,18 @@ var testReasons, testNames, testInstructors []string
 var testPlace, testWeekday int
 var testDay string
 var testData []model.KyukoData
+
+var (
+	T_CONSUMER_KEY        = os.Getenv("T_CONSUMER_KEY")
+	T_CONSUMER_SECRET     = os.Getenv("T_CONSUMER_SECRET")
+	T_ACCESS_TOKEN        = os.Getenv("T_ACCESS_TOKEN")
+	T_ACCESS_TOKEN_SECRET = os.Getenv("T_ACCESS_TOKEN_SECRET")
+
+	I_CONSUMER_KEY        = os.Getenv("I_CONSUMER_KEY")
+	I_CONSUMER_SECRET     = os.Getenv("I_CONSUMER_SECRET")
+	I_ACCESS_TOKEN        = os.Getenv("I_ACCESS_TOKEN")
+	I_ACCESS_TOKEN_SECRET = os.Getenv("I_ACCESS_TOKEN_SECRET")
+)
 
 func init() {
 	testPeriods = []int{2, 2, 2, 5}
@@ -37,6 +50,9 @@ func init() {
 // どうやってテストしよう
 func testUpdate(t *testing.T) {
 	var err error
+	iClient := NewTwitterClient(I_CONSUMER_KEY, I_CONSUMER_SECRET, I_ACCESS_TOKEN, I_ACCESS_TOKEN_SECRET)
+	tClient := NewTwitterClient(T_CONSUMER_KEY, T_CONSUMER_SECRET, T_ACCESS_TOKEN, T_ACCESS_TOKEN_SECRET)
+
 	err = Update(tClient, "test")
 	if err != nil {
 		t.Fatalf("tweetに失敗しました\nerr: %s", err)
