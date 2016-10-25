@@ -1,0 +1,6 @@
+[Unit]
+Description=Cancelled class notificator for Doshisha University
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/kyuko
