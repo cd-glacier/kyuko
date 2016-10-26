@@ -16,6 +16,12 @@ run:
 test:
 	godep go test -v ./...
 
+test/up:
+	sql-migrate up -env="development"
+
+test/down:
+	sql-migrate -env="development"
+
 test/init:
 	#sudo service mysql restart
 	sudo mysql.server restart
@@ -27,11 +33,9 @@ migrate/init:
 	mysql -u root -h localhost --protocol tcp -e "create database \`$(DBNAME)\`" -p
 
 migrate/up:
-	#sql-migrate up -env="development"
 	sql-migrate up 
 
 migrate/down:
-	#sql-migrate -env="development"
 	sql-migrate down
 
 migrate/status:

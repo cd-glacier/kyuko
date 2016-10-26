@@ -12,7 +12,7 @@ type DB struct {
 
 func (db *DB) Connect() error {
 	var err error
-	db.db, err = sql.Open("mysql", "root:password@/kyuko")
+	db.db, err = sql.Open("mysql", "root:password@/kyuko_dev")
 	return err
 }
 

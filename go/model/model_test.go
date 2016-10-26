@@ -47,13 +47,13 @@ func TestSelectAll(t *testing.T) {
 func TestDelete(t *testing.T) {
 	var err error
 
-	testData := KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "SelectAll Test", Instructor: "tsetMan", Reason: "darui"}
+	testData := KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "Delete Test", Instructor: "tsetMan", Reason: "darui"}
 	_, err = db.Insert(testData)
 	if err != nil {
 		t.Fatalf("insert に失敗: %s", err)
 	}
 
-	result, err := db.DeleteWhereDayAndClassName("2016/09/26", "SelectAll Test")
+	result, err := db.DeleteWhereDayAndClassName("2016/09/26", "Delete Test")
 	affectedRows, _ := result.RowsAffected()
 	if err != nil || int(affectedRows) <= 0 {
 		t.Fatalf("deleteに失敗\n%s", err)
