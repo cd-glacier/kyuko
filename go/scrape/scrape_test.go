@@ -237,10 +237,16 @@ func TestScrape(t *testing.T) {
 	if !reflect.DeepEqual(allData, testData) {
 		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testData, allData)
 	}
+}
 
-	allData, err = Scrape(noKyukoDoc)
+func TestScrapeWithNoClass(t *testing.T) {
+	result, err := Scrape(noKyukoDoc)
 	if err != nil {
 		t.Fatalf("scrapingに失敗しました\n%s", err)
+	}
+
+	if (len(result) != 0) {
+		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testData, result)
 	}
 }
 
