@@ -3,6 +3,7 @@ package twitter
 import (
 	"errors"
 	"strconv"
+	"unicode/utf8"
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
@@ -72,15 +73,17 @@ func CreateContent(kyuko []model.KyukoData) ([]string, error) {
 
 	// create content
 	tw := KANJIweekday + "曜日の休講情報\n"
+	tweetLen := 9
 	for _, line := range lines {
-		if len([]rune(tw+line)) > 140 {
+		lineLen := utf8.RuneCountInString(line)
+		if tweetLen + lineLen > 140 {
 			tws = append(tws, tw)
 			tw = ""
 			tw = KANJIweekday + "曜日の休講情報\n"
-			tw = tw + line
-		} else {
-			tw = tw + line
+			tweetLen = 9
 		}
+		tw = tw + line
+		tweetLen += lineLen
 	}
 	tws = append(tws, tw)
 
