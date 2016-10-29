@@ -1,9 +1,13 @@
 # encoding: utf-8
-require "active_record"
-require './model.rb'
+#require "active_record"
+#require './model.rb'
+require "mysql"
 
+=begin
 class Kyuko < ActiveRecord::Base
 end
+=end
+
 
 class Extraction
 	def extract_time(line)
@@ -73,32 +77,38 @@ class Extraction
 
 end
 
-=begin
+	
+@client = Mysql.connect('localhost', 'root', password, 'kyuko')
 data = Extraction.new
 data.extract_file('./tmp/clockworkd.tweet.output')
 data_imade = data.get_imade
 data_imade.each do |data|
+  stmt = @client.prepare("insert into kyuko_data (period, class_name, instructor, day, place) values(?, ?, ? ,?)")
+  stmt.execute data[:when], data[:name], data[:instructor], data[:date], 2
+=begin
 	kyuko = Kyuko.new
 	kyuko.when = data[:when]
 	kyuko.name = data[:name]
 	kyuko.instructor = data[:instructor]
 	kyuko.date = data[:date]
 	kyuko.save
+=end
 end
 
 data_tanabe = data.get_tanabe
 data_tanabe.each do |data|
+  stmt = @client.prepare("insert into kyuko_data (period, class_name, instructor, day, place) values(?, ?, ? ,?)")
+  stmt.execute data[:when], data[:name], data[:instructor], data[:date], 1
+=begin
 	kyuko = Kyuko.new
 	kyuko.when = data[:when]
 	kyuko.name = data[:name]
 	kyuko.instructor = data[:instructor]
 	kyuko.date = data[:date]
 	kyuko.save
-end
 =end
+end
 
-
-p Kyuko.where("instructor like ?", "村上みか")
 
 
 

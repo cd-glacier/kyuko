@@ -33,10 +33,10 @@ migrate/init:
 	mysql -u root -h localhost --protocol tcp -e "create database \`$(DBNAME)\`" -p
 
 migrate/up:
-	sql-migrate up 
+	sql-migrate up -env="production"
 
 migrate/down:
-	sql-migrate down
+	sql-migrate down -env="production"
 
 migrate/status:
 	sql-migrate status

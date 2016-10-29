@@ -71,7 +71,10 @@ func Exec(place int, client *goTwitter.Client) error {
 	}
 
 	for _, tw := range tws {
-		twitter.Update(client, tw)
+		err := twitter.Update(client, tw)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
