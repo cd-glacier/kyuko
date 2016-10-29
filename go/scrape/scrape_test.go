@@ -245,8 +245,8 @@ func TestScrapeWithNoClass(t *testing.T) {
 		t.Fatalf("scrapingに失敗しました\n%s", err)
 	}
 
-	if (len(result) != 0) {
-		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testData, result)
+	if !reflect.DeepEqual(result, noTestData) {
+		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", noTestData, result)
 	}
 }
 
