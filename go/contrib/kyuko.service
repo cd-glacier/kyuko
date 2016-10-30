@@ -4,3 +4,15 @@ Description=Cancelled class notificator for Doshisha University
 [Service]
 Type=oneshot
 ExecStart=/usr/local/bin/kyuko
+
+EnvironmentFile=/etc/conf.d/kyuko
+
+#Environment=T_CONSUMER_KEY=TYPE_YOUR_KEY
+#Environment=T_CONSUMER_SECRET=TYPE_YOUR_KEY
+#Environment=T_ACCESS_TOKEN=TYPE_YOUR_KEY
+#Environment=T_ACCESS_TOKEN_SECRET=TYPE_YOUR_KEY
+
+#Environment=I_CONSUMER_KEY=TYPE_YOUR_KEY
+#Environment=I_CONSUMER_SECRET=TYPE_YOUR_KEY
+#Environment=I_ACCESS_TOKEN=TYPE_YOUR_KEY
+#Environment=I_ACCESS_TOKEN_SECRET=TYPE_YOUR_KEY
