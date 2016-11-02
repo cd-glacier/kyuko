@@ -22,7 +22,7 @@ func (db *DB) Close() error {
 }
 
 func (db *DB) Insert(k KyukoData) (sql.Result, error) {
-	result, err := db.db.Exec("insert into kyuko_data values(?, ?, ?, ?, ?, ?, ?, ?)", 0, k.Place, k.Weekday, k.Period, k.Day, k.ClassName, k.Instructor, k.Reason)
+	result, err := db.db.Exec("INSERT INTO `kyuko_data` VALUES(?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `reason`=?;", 0, k.Place, k.Weekday, k.Period, k.Day, k.ClassName, k.Instructor, k.Reason, k.Reason)
 	return result, err
 }
 
