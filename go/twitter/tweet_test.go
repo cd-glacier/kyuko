@@ -1,10 +1,10 @@
 package twitter
 
 import (
+	"fmt"
+	"github.com/g-hyoga/kyuko/go/model"
 	"os"
 	"testing"
-
-	"github.com/g-hyoga/kyuko/go/model"
 )
 
 var testPeriods []int
@@ -110,6 +110,15 @@ func TestCreateContent(t *testing.T) {
 		}
 	}
 
+}
+
+func TestGetDM(t *testing.T) {
+	tClient := NewTwitterClient(T_CONSUMER_KEY, T_CONSUMER_SECRET, T_ACCESS_TOKEN, T_ACCESS_TOKEN_SECRET)
+	dms, err := GetDM(tClient)
+	if err != nil {
+		t.Fatalf("GetDmでエラー\nerr: %s", err)
+	}
+	fmt.Println(dms)
 }
 
 func BenchmarkCreateLine(b *testing.B) {

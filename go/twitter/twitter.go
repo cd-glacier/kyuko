@@ -76,7 +76,7 @@ func CreateContent(kyuko []model.KyukoData) ([]string, error) {
 	tweetLen := 9
 	for _, line := range lines {
 		lineLen := utf8.RuneCountInString(line)
-		if tweetLen + lineLen > 140 {
+		if tweetLen+lineLen > 140 {
 			tws = append(tws, tw)
 			tw = ""
 			tw = KANJIweekday + "曜日の休講情報\n"
@@ -97,4 +97,10 @@ func Update(client *twitter.Client, text string) error {
 		return err
 	}
 	return nil
+}
+
+func GetDM(client *twitter.Client) ([]twitter.DirectMessage, error) {
+	para := &twitter.DirectMessageGetParams{Count: 3}
+	dms, _, err := client.DirectMessages.Get(para)
+	return dms, err
 }
