@@ -10,4 +10,8 @@ Ruby -> Golang
 から休講情報をスクレイピングしてきて
 twitterになげています
 
+# 休講ランク
 
+[kyukoRank](https://github.com/g-hyoga/kyukoRank)
+
+こっちで作ります
