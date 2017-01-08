@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strconv"
 	"unicode/utf8"
+	"strings"
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
@@ -103,4 +104,9 @@ func GetDM(client *twitter.Client) ([]twitter.DirectMessage, error) {
 	para := &twitter.DirectMessageGetParams{Count: 3}
 	dms, _, err := client.DirectMessages.Get(para)
 	return dms, err
+}
+
+func SplitDM(text string) []string {
+	classnames := strings.Split(text, ",")
+	return classnames
 }
