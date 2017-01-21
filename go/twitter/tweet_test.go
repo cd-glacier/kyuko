@@ -5,8 +5,8 @@ import (
 	"github.com/g-hyoga/kyuko/go/model"
 	//"github.com/dghubble/go-twitter/twitter"
 	"os"
-	"testing"
 	"reflect"
+	"testing"
 )
 
 var testPeriods []int
@@ -123,14 +123,14 @@ func TestGetDM(t *testing.T) {
 	//fmt.Println(dms)
 }
 
-func TestSplitDM(t *testing.T){
-	dm := "java,c,python,golang"
-	ans := []string {"java", "c", "python", "golang"}
+func TestSplitDM(t *testing.T) {
+	dm := "java  , c ,python   , gol ang "
+	ans := []string{"java", "c", "python", "golang"}
 	classnames := SplitDM(dm)
 	fmt.Println(dm)
 	fmt.Println(classnames)
 	if !reflect.DeepEqual(ans, classnames) {
-		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v",ans, classnames)
+		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", ans, classnames)
 	}
 }
 
