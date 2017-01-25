@@ -41,7 +41,7 @@ func ScanAll(rows *sql.Rows) ([]KyukoData, error) {
 
 func (db *DB) SelectAll() ([]KyukoData, error) {
 	kyukoData := []KyukoData{}
-	rows, err := db.db.Query("select * from kyuko_data")
+	rows, err := db.db.Query("select * from kyuko_data where id in(select min(id) from kyuko_data group by class_name, day)")
 	if err != nil {
 		return kyukoData, err
 	}
@@ -59,9 +59,4 @@ func (db *DB) DeleteWhereDayAndClassName(day, className string) (sql.Result, err
 		return result, err
 	}
 	return result, err
-}
-
-//重複のあるくそみたいなデータベースになっているので
-func (db *DB) DeleteDuplicate() {
-
 }
