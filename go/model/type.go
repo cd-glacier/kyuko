@@ -2,6 +2,7 @@ package model
 
 type KyukoData struct {
 	ID         int    `json:"id"`
+	Canceled   int    `json:canceled`
 	Place      int    `json:"place"`
 	Weekday    int    `json:"week"`
 	Period     int    `json:"period"`

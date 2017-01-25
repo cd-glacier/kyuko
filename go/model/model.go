@@ -12,7 +12,7 @@ type DB struct {
 
 func (db *DB) Connect() error {
 	var err error
-	db.db, err = sql.Open("mysql", "root:password@/kyuko_dev")
+	db.db, err = sql.Open("mysql", "root:password@/kyuko")
 	return err
 }
 
@@ -35,6 +35,43 @@ func ScanAll(rows *sql.Rows) ([]KyukoData, error) {
 			return kyukoData, err
 		}
 		kyukoData = append(kyukoData, k)
+	}
+	return kyukoData, err
+}
+
+func ScanAllCanceledClass(rows *sql.Rows) ([]KyukoData, error) {
+	kyukoData := []KyukoData{}
+	var err error
+	for rows.Next() {
+		var k KyukoData
+		if err = rows.Scan(&k.ID, &k.Canceled, &k.Place, &k.Weekday, &k.Period, &k.Day, &k.ClassName, &k.Instructor); err != nil {
+			return kyukoData, err
+		}
+		kyukoData = append(kyukoData, k)
+	}
+	return kyukoData, err
+}
+
+func (db *DB) InsertCanceledClass(k KyukoData) (sql.Result, error) {
+	result, err := db.db.Exec("INSERT INTO `canceled_class` VALUES(?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `canceled`=?;", 0, k.Place, k.Canceled, k.Weekday, k.Period, k.Day, k.ClassName, k.Instructor, k.Canceled)
+	return result, err
+}
+
+func (db *DB) UpdateCanceledClass(id, canceled int) (sql.Result, error) {
+	result, err := db.db.Exec("UPDATE `canceled_class` SET `canceled`=? WHERE `id`=?;", canceled, id)
+	return result, err
+}
+
+func (db *DB) SelectAllCanceledClass() ([]KyukoData, error) {
+	kyukoData := []KyukoData{}
+	rows, err := db.db.Query("SELECT * FROM `canceled_class`")
+	if err != nil {
+		return kyukoData, err
+	}
+	defer rows.Close()
+	kyukoData, err = ScanAllCanceledClass(rows)
+	if err != nil {
+		return kyukoData, err
 	}
 	return kyukoData, err
 }
