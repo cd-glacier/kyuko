@@ -12,7 +12,7 @@ type DB struct {
 
 func (db *DB) Connect() error {
 	var err error
-	db.db, err = sql.Open("mysql", "root:password@/kyuko_dev")
+	db.db, err = sql.Open("mysql", "root:password@/kyuko")
 	return err
 }
 
@@ -59,4 +59,9 @@ func (db *DB) DeleteWhereDayAndClassName(day, className string) (sql.Result, err
 		return result, err
 	}
 	return result, err
+}
+
+//重複のあるくそみたいなデータベースになっているので
+func (db *DB) DeleteDuplicate() {
+
 }
