@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"errors"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -26,6 +27,25 @@ func (db *DB) Insert(k KyukoData) (sql.Result, error) {
 	return result, err
 }
 
+func (db *DB) InsertCanceledClass(c CanceledClass) (sql.Result, error) {
+	sql := "INSERT INTO `canceled_class` (canceled, place, week, period, year, season, class_name, instructor) VALUES(?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `canceled`=?;"
+
+	result, err := db.db.Exec(sql, c.Canceled, c.Place, c.Weekday, c.Period, c.Year, c.Season, c.ClassName, c.Instructor, c.Canceled)
+	return result, err
+}
+
+func (db *DB) InsertDay(d Day) (sql.Result, error) {
+	sql := "INSERT INTO `day` (canceled_class_id, day) VALUES(?, ?);"
+	result, err := db.db.Exec(sql, d.CanceledClassID, d.Date)
+	return result, err
+}
+
+func (db *DB) InsertReason(r Reason) (sql.Result, error) {
+	sql := "INSERT INTO `reason` (canceled_class_id, reason) VALUES(?, ?);"
+	result, err := db.db.Exec(sql, r.CanceledClassID, r.Reason)
+	return result, err
+}
+
 func ScanAll(rows *sql.Rows) ([]KyukoData, error) {
 	kyukoData := []KyukoData{}
 	var err error
@@ -39,41 +59,18 @@ func ScanAll(rows *sql.Rows) ([]KyukoData, error) {
 	return kyukoData, err
 }
 
-func ScanAllCanceledClass(rows *sql.Rows) ([]KyukoData, error) {
-	kyukoData := []KyukoData{}
+func ScanCanceledClass(rows *sql.Rows) ([]CanceledClass, error) {
+	canceledClass := []CanceledClass{}
 	var err error
 	for rows.Next() {
-		var k KyukoData
-		if err = rows.Scan(&k.ID, &k.Canceled, &k.Place, &k.Weekday, &k.Period, &k.Day, &k.ClassName, &k.Instructor); err != nil {
-			return kyukoData, err
+		var c CanceledClass
+		if err = rows.Scan(&c.ID, &c.Canceled, &c.Place, &c.Weekday, &c.Period, &c.Year, &c.Season, &c.ClassName, &c.Instructor); err != nil {
+			return canceledClass, err
 		}
-		kyukoData = append(kyukoData, k)
+		canceledClass = append(canceledClass, c)
 	}
-	return kyukoData, err
-}
+	return canceledClass, err
 
-func (db *DB) InsertCanceledClass(k KyukoData) (sql.Result, error) {
-	result, err := db.db.Exec("INSERT INTO `canceled_class` VALUES(?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `canceled`=?;", 0, k.Place, k.Canceled, k.Weekday, k.Period, k.Day, k.ClassName, k.Instructor, k.Canceled)
-	return result, err
-}
-
-func (db *DB) UpdateCanceledClass(id, canceled int) (sql.Result, error) {
-	result, err := db.db.Exec("UPDATE `canceled_class` SET `canceled`=? WHERE `id`=?;", canceled, id)
-	return result, err
-}
-
-func (db *DB) SelectAllCanceledClass() ([]KyukoData, error) {
-	kyukoData := []KyukoData{}
-	rows, err := db.db.Query("SELECT * FROM `canceled_class`")
-	if err != nil {
-		return kyukoData, err
-	}
-	defer rows.Close()
-	kyukoData, err = ScanAllCanceledClass(rows)
-	if err != nil {
-		return kyukoData, err
-	}
-	return kyukoData, err
 }
 
 func (db *DB) SelectAll() ([]KyukoData, error) {
@@ -88,6 +85,26 @@ func (db *DB) SelectAll() ([]KyukoData, error) {
 		return kyukoData, err
 	}
 	return kyukoData, err
+}
+
+func (db *DB) ShowCanceledClassID(c CanceledClass) (int, error) {
+	sql := "select * from canceled_class where class_name=? and year=? and season = ?"
+	rows, err := db.db.Query(sql, c.ClassName, c.Year, c.Season)
+	if err != nil {
+		return -1, err
+	}
+	defer rows.Close()
+	canceledclass := []CanceledClass{}
+	canceledclass, err = ScanCanceledClass(rows)
+	if err != nil {
+		return -1, err
+	}
+	if len(canceledclass) != 1 {
+		return -1, errors.New("IDが一意に定まりませんでした")
+	} else if len(canceledclass) == 0 {
+		return -1, errors.New("DBに存在しないデータです")
+	}
+	return canceledclass[0].ID, nil
 }
 
 func (db *DB) DeleteWhereDayAndClassName(day, className string) (sql.Result, error) {

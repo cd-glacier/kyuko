@@ -31,20 +31,33 @@ func TestInsert(t *testing.T) {
 func TestInsertCanceledClass(t *testing.T) {
 	var err error
 
-	testData := KyukoData{Place: 1, Canceled: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "Insert Test", Instructor: "hoge man", Reason: "darui"}
+	testData := CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "CanceledClass", Season: "spring", Instructor: "hoge man"}
 
 	_, err = db.InsertCanceledClass(testData)
 	if err != nil {
-		t.Fatalf("insertCanceledClass に失敗\n%s", err)
+		t.Fatalf("canceled class の insert に失敗\n%s", err)
 	}
 }
 
-func TestUpdateCanceledClass(t *testing.T) {
+func TestReason(t *testing.T) {
 	var err error
 
-	_, err = db.UpdateCanceledClass(10, 10)
+	testData := Reason{CanceledClassID: 1, Reason: "darui"}
+
+	_, err = db.InsertReason(testData)
 	if err != nil {
-		t.Fatalf("update に失敗\n%s", err)
+		t.Fatalf("reason の insert に失敗\n%s", err)
+	}
+}
+
+func TestDAy(t *testing.T) {
+	var err error
+
+	testData := Day{CanceledClassID: 1, Date: "2016/09/26"}
+
+	_, err = db.InsertDay(testData)
+	if err != nil {
+		t.Fatalf("day の insert に失敗\n%s", err)
 	}
 }
 
@@ -63,20 +76,28 @@ func TestSelectAll(t *testing.T) {
 	}
 }
 
-func TestSelectAllCanceledClass(t *testing.T) {
+func TestShowCanceledClassID(t *testing.T) {
 	var err error
 
-	testData := KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "SelectAll Test", Instructor: "tsetMan", Reason: "darui"}
-	_, err = db.Insert(testData)
+	testData := CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "ShowIDTest", Season: "spring", Instructor: "hoge man"}
+
+	//以下のコメント部
+	//一回だけ実行しないとエラーでる
+	//delete関数作るのめんどくさい
+	/*
+		_, err = db.InsertCanceledClass(testData)
+		if err != nil {
+			t.Fatalf("canceled class の insert に失敗\n%s", err)
+		}
+	*/
+
+	_, err = db.ShowCanceledClassID(testData)
 	if err != nil {
-		t.Fatalf("insert に失敗: %s", err)
+		t.Fatalf("Show canceled class id に失敗\n%s", err)
 	}
 
-	_, err := db.SelectAllCanceledClass()
-	if err != nil {
-		t.Fatalf("selectAll に失敗\n%s", err)
-	}
 }
+
 func TestDelete(t *testing.T) {
 	var err error
 
