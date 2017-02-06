@@ -14,7 +14,6 @@ func TestConnectDB(t *testing.T) {
 	if err != nil {
 		t.Fatal("データベースに接続できません")
 	}
-
 }
 
 func TestInsert(t *testing.T) {
@@ -112,5 +111,33 @@ func TestDelete(t *testing.T) {
 	if err != nil || int(affectedRows) <= 0 {
 		t.Fatalf("deleteに失敗\n%s", err)
 	}
+}
 
+func TestGetYear(t *testing.T) {
+	testData := "2016/02/06"
+	out, err := getYear(testData)
+	if err != nil {
+		t.Fatalf("Error getYear func: %s", err)
+	}
+	if out != 2016 {
+		t.Fatal("Failed GetYear func\n want: %s, got: %s", 2016, out)
+	}
+}
+
+func TestGetSeason(t *testing.T) {
+	out, err := getSeason("2016/01/01")
+	if err != nil {
+		t.Fatalf("Error getSeason func: %s", err)
+	}
+	if out != "autumn" {
+		t.Fatal("Failed GetSeason func\n want: %s, got: %s", "autumn", out)
+	}
+
+	out, err = getSeason("2016/05/01")
+	if err != nil {
+		t.Fatalf("Error getSeason func: %s", err)
+	}
+	if out != "spring" {
+		t.Fatal("Failed GetSeason func\n want: %s, got: %s", "spring", out)
+	}
 }

@@ -3,6 +3,8 @@ package model
 import (
 	"database/sql"
 	"errors"
+	"strconv"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -113,4 +115,45 @@ func (db *DB) DeleteWhereDayAndClassName(day, className string) (sql.Result, err
 		return result, err
 	}
 	return result, err
+}
+
+func KyukoToCanceled(k KyukoData) (CanceledClass, error) {
+	season, err := getSeason(k.Day)
+	if err != nil {
+		return CanceledClass{}, err
+	}
+
+	year, err := getYear(k.Day)
+	if err != nil {
+		return CanceledClass{}, err
+	}
+
+	return CanceledClass{
+		Place:      k.Place,
+		Weekday:    k.Weekday,
+		Period:     k.Period,
+		ClassName:  k.ClassName,
+		Instructor: k.Instructor,
+		Season:     season,
+		Year:       year,
+	}, nil
+}
+
+func getYear(day string) (int, error) {
+	strYear := strings.Split(day, "/")[0]
+	year, _ := strconv.Atoi(strYear)
+	return year, nil
+}
+
+func getSeason(day string) (string, error) {
+	strMonth := strings.Split(day, "/")[1]
+	month, _ := strconv.Atoi(strMonth)
+
+	if month >= 3 && month <= 8 {
+		return "spring", nil
+	} else if (month >= 9 && month <= 12) || (month >= 1 && month <= 2) {
+		return "autumn", nil
+	}
+
+	return "", errors.New("Season are not uniquely determined")
 }

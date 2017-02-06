@@ -63,6 +63,16 @@ func Exec(place int, client *goTwitter.Client) error {
 		if err != nil {
 			return err
 		}
+
+		canceledClass, err := model.KyukoToCanceled(data)
+		if err != nil {
+			return err
+		}
+		_, err = db.InsertCanceledClass(canceledClass)
+		if err != nil {
+			return err
+		}
+
 	}
 
 	tws, err := twitter.CreateContent(kyukoData)
