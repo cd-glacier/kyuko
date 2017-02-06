@@ -12,7 +12,8 @@ import (
 
 // scrapingを実行してデータベースに保存する
 // その後twitterに投稿
-func Exec(place int, client *goTwitter.Client) error {
+func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
+	var kyukoResult []model.KyukoData
 	var err error
 
 	//今日の日付
@@ -32,50 +33,55 @@ func Exec(place int, client *goTwitter.Client) error {
 	//第二引数:曜日
 	url, err := scrape.SetUrl(place, weekday)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	//http
 	reader, err := scrape.Get(url)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	doc, err := goquery.NewDocumentFromReader(reader)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	kyukoData, err := scrape.Scrape(doc)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var db model.DB
 	err = db.Connect()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer db.Close()
 
 	for _, data := range kyukoData {
 		_, err = db.Insert(data)
+		kyukoResult = append(kyukoResult, data)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	tws, err := twitter.CreateContent(kyukoData)
+	//tws, err := twitter.CreateContent(kyukoData)
+	_, err = twitter.CreateContent(kyukoData)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	for _, tw := range tws {
-		err := twitter.Update(client, tw)
-		if err != nil {
-			return err
+	/*
+		for _, tw := range tws {
+			err := twitter.Update(client, tw)
+			if err != nil {
+				return nil, err
+				return nil, err
+			}
 		}
-	}
+	*/
 
-	return nil
+	return kyukoData, nil
 }
