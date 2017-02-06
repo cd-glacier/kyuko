@@ -28,6 +28,39 @@ func TestInsert(t *testing.T) {
 	}
 }
 
+func TestInsertCanceledClass(t *testing.T) {
+	var err error
+
+	testData := CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "CanceledClass", Season: "spring", Instructor: "hoge man"}
+
+	_, err = db.InsertCanceledClass(testData)
+	if err != nil {
+		t.Fatalf("canceled class の insert に失敗\n%s", err)
+	}
+}
+
+func TestReason(t *testing.T) {
+	var err error
+
+	testData := Reason{CanceledClassID: 1, Reason: "darui"}
+
+	_, err = db.InsertReason(testData)
+	if err != nil {
+		t.Fatalf("reason の insert に失敗\n%s", err)
+	}
+}
+
+func TestDAy(t *testing.T) {
+	var err error
+
+	testData := Day{CanceledClassID: 1, Date: "2016/09/26"}
+
+	_, err = db.InsertDay(testData)
+	if err != nil {
+		t.Fatalf("day の insert に失敗\n%s", err)
+	}
+}
+
 func TestSelectAll(t *testing.T) {
 	var err error
 
@@ -40,6 +73,27 @@ func TestSelectAll(t *testing.T) {
 	_, err = db.SelectAll()
 	if err != nil {
 		t.Fatalf("selectAll に失敗\n%s", err)
+	}
+}
+
+func TestShowCanceledClassID(t *testing.T) {
+	var err error
+
+	testData := CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "ShowIDTest", Season: "spring", Instructor: "hoge man"}
+
+	//以下のコメント部
+	//一回だけ実行しないとエラーでる
+	//delete関数作るのめんどくさい
+	/*
+		_, err = db.InsertCanceledClass(testData)
+		if err != nil {
+			t.Fatalf("canceled class の insert に失敗\n%s", err)
+		}
+	*/
+
+	_, err = db.ShowCanceledClassID(testData)
+	if err != nil {
+		t.Fatalf("Show canceled class id に失敗\n%s", err)
 	}
 
 }
