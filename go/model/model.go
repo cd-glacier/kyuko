@@ -30,9 +30,9 @@ func (db *DB) Insert(k KyukoData) (sql.Result, error) {
 }
 
 func (db *DB) InsertCanceledClass(c CanceledClass) (sql.Result, error) {
-	sql := "INSERT INTO `canceled_class` (canceled, place, week, period, year, season, class_name, instructor) VALUES(?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `canceled`=?;"
+	sql := "INSERT INTO `canceled_class` (canceled, place, week, period, year, season, class_name, instructor) VALUES(?, ?, ?, ?, ?, ?, ?, ?);"
 
-	result, err := db.db.Exec(sql, c.Canceled, c.Place, c.Weekday, c.Period, c.Year, c.Season, c.ClassName, c.Instructor, c.Canceled)
+	result, err := db.db.Exec(sql, c.Canceled, c.Place, c.Weekday, c.Period, c.Year, c.Season, c.ClassName, c.Instructor)
 	return result, err
 }
 
@@ -111,6 +111,15 @@ func (db *DB) ShowCanceledClassID(c CanceledClass) (int, error) {
 
 func (db *DB) DeleteWhereDayAndClassName(day, className string) (sql.Result, error) {
 	result, err := db.db.Exec("delete from kyuko_data where day = ? and class_name = ?", day, className)
+	if err != nil {
+		return result, err
+	}
+	return result, err
+}
+
+func (db *DB) AddCanceled(id int) (sql.Result, error) {
+	sql := "UPDATE canceled_class SET canceled = canceled+1 WHERE id = ?;"
+	result, err := db.db.Exec(sql, id)
 	if err != nil {
 		return result, err
 	}

@@ -113,6 +113,26 @@ func TestDelete(t *testing.T) {
 	}
 }
 
+func TestAddCanceled(t *testing.T) {
+	var err error
+	testData := CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "ADDTest", Season: "spring", Instructor: "hoge man"}
+
+	_, err = db.InsertCanceledClass(testData)
+	if err != nil {
+		t.Fatalf("Error AddCanceled Test: failed InsertCanceledClass func\n%s", err)
+	}
+
+	id, err := db.ShowCanceledClassID(testData)
+	if err != nil {
+		t.Fatalf("Error AddCanceled Test: failed showCanceledClassID\n%s", err)
+	}
+
+	_, err = db.AddCanceled(id)
+	if err != nil {
+		t.Fatalf("Failed AddCanceled func\n%s", err)
+	}
+}
+
 func TestGetYear(t *testing.T) {
 	testData := "2016/02/06"
 	out, err := getYear(testData)
