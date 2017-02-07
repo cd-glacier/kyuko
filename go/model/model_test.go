@@ -2,10 +2,41 @@ package model
 
 import "testing"
 
+type TestData struct {
+	Insert              KyukoData
+	InsertCanceledClass CanceledClass
+	SelectAll           KyukoData
+	Delete              KyukoData
+	ShowID              CanceledClass
+	Add                 CanceledClass
+}
+
 var db DB
+var testData TestData
 
 func init() {
 	db.Connect()
+
+	testData.Insert = KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "Insert Test", Instructor: "hoge man", Reason: "darui"}
+	testData.InsertCanceledClass = CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "CanceledClass", Season: "spring", Instructor: "hoge man"}
+	testData.SelectAll = KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "SelectAll Test", Instructor: "tsetMan", Reason: "darui"}
+	testData.ShowID = CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "ShowIDTest", Season: "spring", Instructor: "hoge man"}
+	testData.Delete = KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "Delete Test", Instructor: "tsetMan", Reason: "darui"}
+	testData.Add = CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "ADDTest", Season: "spring", Instructor: "hoge man"}
+
+}
+
+func deleteTestData() {
+	db.DeleteWhereDayAndClassName("2016/09/26", "Insert Test")
+	db.DeleteWhereDayAndClassName("2016/09/26", "SelectAll Test")
+	db.DeleteWhereDayAndClassName("2016/09/26", "Delete Test")
+
+	id, _ := db.ShowCanceledClassID(testData.InsertCanceledClass)
+	db.deleteCanceled(id)
+	id, _ = db.ShowCanceledClassID(testData.ShowID)
+	db.deleteCanceled(id)
+	id, _ = db.ShowCanceledClassID(testData.Add)
+	db.deleteCanceled(id)
 }
 
 func TestConnectDB(t *testing.T) {
@@ -17,28 +48,27 @@ func TestConnectDB(t *testing.T) {
 }
 
 func TestInsert(t *testing.T) {
+	defer deleteTestData()
 	var err error
 
-	testData := KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "Insert Test", Instructor: "hoge man", Reason: "darui"}
-
-	_, err = db.Insert(testData)
+	_, err = db.Insert(testData.Insert)
 	if err != nil {
 		t.Fatalf("insert に失敗\n%s", err)
 	}
 }
 
 func TestInsertCanceledClass(t *testing.T) {
+	defer deleteTestData()
 	var err error
 
-	testData := CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "CanceledClass", Season: "spring", Instructor: "hoge man"}
-
-	_, err = db.InsertCanceledClass(testData)
+	_, err = db.InsertCanceledClass(testData.InsertCanceledClass)
 	if err != nil {
 		t.Fatalf("canceled class の insert に失敗\n%s", err)
 	}
 }
 
 func TestReason(t *testing.T) {
+	defer deleteTestData()
 	var err error
 
 	testData := Reason{CanceledClassID: 1, Reason: "darui"}
@@ -49,7 +79,8 @@ func TestReason(t *testing.T) {
 	}
 }
 
-func TestDAy(t *testing.T) {
+func TestDay(t *testing.T) {
+	defer deleteTestData()
 	var err error
 
 	testData := Day{CanceledClassID: 1, Date: "2016/09/26"}
@@ -61,10 +92,10 @@ func TestDAy(t *testing.T) {
 }
 
 func TestSelectAll(t *testing.T) {
+	defer deleteTestData()
 	var err error
 
-	testData := KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "SelectAll Test", Instructor: "tsetMan", Reason: "darui"}
-	_, err = db.Insert(testData)
+	_, err = db.Insert(testData.SelectAll)
 	if err != nil {
 		t.Fatalf("insert に失敗: %s", err)
 	}
@@ -76,32 +107,29 @@ func TestSelectAll(t *testing.T) {
 }
 
 func TestShowCanceledClassID(t *testing.T) {
+	defer deleteTestData()
 	var err error
 
-	testData := CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "ShowIDTest", Season: "spring", Instructor: "hoge man"}
+	_, err = db.InsertCanceledClass(testData.ShowID)
+	if err != nil {
+		t.Fatalf("canceled class の insert に失敗\n%s", err)
+	}
 
-	//以下のコメント部
-	//一回だけ実行しないとエラーでる
-	//delete関数作るのめんどくさい
-	/*
-		_, err = db.InsertCanceledClass(testData)
-		if err != nil {
-			t.Fatalf("canceled class の insert に失敗\n%s", err)
-		}
-	*/
-
-	_, err = db.ShowCanceledClassID(testData)
+	id, err := db.ShowCanceledClassID(testData.ShowID)
 	if err != nil {
 		t.Fatalf("Show canceled class id に失敗\n%s", err)
 	}
 
+	_, err = db.deleteCanceled(id)
+	if err != nil {
+		t.Fatalf("Error ShowCanceledClass: failed DeleteCnacled func\n%s", err)
+	}
 }
 
 func TestDelete(t *testing.T) {
 	var err error
 
-	testData := KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "Delete Test", Instructor: "tsetMan", Reason: "darui"}
-	_, err = db.Insert(testData)
+	_, err = db.Insert(testData.Delete)
 	if err != nil {
 		t.Fatalf("insert に失敗: %s", err)
 	}
@@ -114,15 +142,15 @@ func TestDelete(t *testing.T) {
 }
 
 func TestAddCanceled(t *testing.T) {
+	defer deleteTestData()
 	var err error
-	testData := CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "ADDTest", Season: "spring", Instructor: "hoge man"}
 
-	_, err = db.InsertCanceledClass(testData)
+	_, err = db.InsertCanceledClass(testData.Add)
 	if err != nil {
 		t.Fatalf("Error AddCanceled Test: failed InsertCanceledClass func\n%s", err)
 	}
 
-	id, err := db.ShowCanceledClassID(testData)
+	id, err := db.ShowCanceledClassID(testData.Add)
 	if err != nil {
 		t.Fatalf("Error AddCanceled Test: failed showCanceledClassID\n%s", err)
 	}

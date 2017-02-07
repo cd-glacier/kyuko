@@ -16,17 +16,6 @@ run:
 test:
 	godep go test -v ./...
 
-test/up:
-	sql-migrate up -env="development"
-
-test/down:
-	sql-migrate -env="development"
-
-test/init:
-	#sudo service mysql restart
-	sudo mysql.server restart
-	mysql -u root -h localhost --protocol tcp -e "create database \`$(TESTDB)\`" -p
-
 migrate/init:
 	#sudo service mysql restart
 	sudo mysql.server restart
