@@ -92,22 +92,19 @@ func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
 		}
 	}
 
-	//masterにmergeする時もどせ
-	//tws, err := twitter.CreateContent(kyukoData)
-	_, err = twitter.CreateContent(kyukoData)
+	tws, err := twitter.CreateContent(kyukoData)
+	//_, err = twitter.CreateContent(kyukoData)
 	if err != nil {
 		return nil, err
 	}
 
-	/*
-		for _, tw := range tws {
-			err := twitter.Update(client, tw)
-			if err != nil {
-				return nil, err
-				return nil, err
-			}
+	for _, tw := range tws {
+		err := twitter.Update(client, tw)
+		if err != nil {
+			return nil, err
+			return nil, err
 		}
-	*/
+	}
 
 	return kyukoData, nil
 }
