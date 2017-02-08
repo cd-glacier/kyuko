@@ -71,6 +71,7 @@ func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
 			return nil, err
 		}
 
+		//挿入するデータが存在するのか確認
 		id, err := db.ShowCanceledClassID(canceledClass)
 		if err != nil {
 			return nil, err
@@ -92,6 +93,7 @@ func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
 		}
 	}
 
+	//masterにmergeする時もどせ
 	//tws, err := twitter.CreateContent(kyukoData)
 	_, err = twitter.CreateContent(kyukoData)
 	if err != nil {
