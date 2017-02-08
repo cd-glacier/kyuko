@@ -8,6 +8,7 @@ type TestData struct {
 	SelectAll           KyukoData
 	Delete              KyukoData
 	ShowID              CanceledClass
+	IsExistToday        KyukoData
 	Add                 CanceledClass
 	Reason              Reason
 	Day                 Day
@@ -23,6 +24,7 @@ func init() {
 	testData.InsertCanceledClass = CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "CanceledClass", Season: "spring", Instructor: "hoge man"}
 	testData.SelectAll = KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "SelectAll Test", Instructor: "tsetMan", Reason: "darui"}
 	testData.ShowID = CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "ShowIDTest", Season: "spring", Instructor: "hoge man"}
+	testData.IsExistToday = KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/11/11", ClassName: "IsExistToday Test", Instructor: "tsetMan", Reason: "darui"}
 	testData.Delete = KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "Delete Test", Instructor: "tsetMan", Reason: "darui"}
 	testData.Add = CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "ADDTest", Season: "spring", Instructor: "hoge man"}
 	testData.Reason = Reason{CanceledClassID: 1, Reason: "darui"}
@@ -33,6 +35,7 @@ func deleteTestData() {
 	db.DeleteWhereDayAndClassName("2016/09/26", "Insert Test")
 	db.DeleteWhereDayAndClassName("2016/09/26", "SelectAll Test")
 	db.DeleteWhereDayAndClassName("2016/09/26", "Delete Test")
+	db.DeleteWhereDayAndClassName("2016/11/11", "IsExistToday Test")
 
 	id, _ := db.ShowCanceledClassID(testData.InsertCanceledClass)
 	db.deleteCanceled(id)
@@ -124,8 +127,27 @@ func TestShowCanceledClassID(t *testing.T) {
 
 	_, err = db.deleteCanceled(id)
 	if err != nil {
-		t.Fatalf("Error ShowCanceledClass: failed DeleteCnacled func\n%s", err)
+		t.Fatalf("Error ShowCanceledClassID: failed DeleteCnacled func\n%s", err)
 	}
+}
+
+func TestIsExistToday(t *testing.T) {
+	defer deleteTestData()
+	var err error
+
+	if isExist, err := db.IsExistToday(testData.IsExistToday); isExist || err != nil {
+		t.Fatalf("Faleid IsExistToday\n%s", err)
+	}
+
+	_, err = db.Insert(testData.IsExistToday)
+	if err != nil {
+		t.Fatalf("Error IsExistToday: failed Insert func\n%s", err)
+	}
+
+	if isExist, err := db.IsExistToday(testData.IsExistToday); !isExist || err != nil {
+		t.Fatalf("Faleid IsExistToday\n%s", err)
+	}
+
 }
 
 func TestDelete(t *testing.T) {

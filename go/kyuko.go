@@ -77,9 +77,8 @@ func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
 			return nil, err
 		}
 
-		//DBに存在するデータなら
-		//1日1回っていう条件もいる
-		if id != -1 {
+		//DBに存在するデータかつ今日のデータでないなら
+		if isExist, _ := db.IsExistToday(data); id != -1 && !isExist {
 			canceledClass.ID = id
 			_, err = db.AddCanceled(canceledClass.ID)
 			if err != nil {

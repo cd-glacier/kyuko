@@ -109,6 +109,25 @@ func (db *DB) ShowCanceledClassID(c CanceledClass) (int, error) {
 	return canceledclass[0].ID, nil
 }
 
+func (db *DB) IsExistToday(k KyukoData) (bool, error) {
+	sql := "select * from kyuko_data where class_name=? and day=?"
+	rows, err := db.db.Query(sql, k.ClassName, k.Day)
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+	kyukoData := []KyukoData{}
+	kyukoData, err = ScanAll(rows)
+	if err != nil {
+		return false, err
+	}
+
+	if len(kyukoData) > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
 func (db *DB) DeleteWhereDayAndClassName(day, className string) (sql.Result, error) {
 	result, err := db.db.Exec("delete from kyuko_data where day = ? and class_name = ?", day, className)
 	if err != nil {
