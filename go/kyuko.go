@@ -71,22 +71,22 @@ func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
 			return nil, err
 		}
 
-		//API用
 		id, err := db.ShowCanceledClassID(canceledClass)
 		if err != nil {
 			return nil, err
 		}
 
-		//DBに存在しないデータなら
-		if id == -1 {
-			_, err = db.InsertCanceledClass(canceledClass)
+		//DBに存在するデータなら
+		//1日1回っていう条件もいる
+		if id != -1 {
+			canceledClass.ID = id
+			_, err = db.AddCanceled(canceledClass.ID)
 			if err != nil {
 				return nil, err
 			}
 		}
 
-		canceledClass.ID = id
-		_, err = db.AddCanceled(canceledClass.ID)
+		_, err = db.InsertCanceledClass(canceledClass)
 		if err != nil {
 			return nil, err
 		}

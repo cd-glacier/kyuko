@@ -175,3 +175,43 @@ func (db *DB) deleteCanceled(id int) (sql.Result, error) {
 	}
 	return result, err
 }
+
+func (db *DB) deleteReason(id int) (sql.Result, error) {
+	sql := "DELETE FROM reason WHERE id = ?;"
+	result, err := db.db.Exec(sql, id)
+	if err != nil {
+		return result, err
+	}
+	return result, err
+
+}
+
+func (db *DB) deleteReasonWhere(canceledID int, reason string) (sql.Result, error) {
+	sql := "DELETE FROM reason WHERE canceled_class_id = ? AND reason = ?;"
+	result, err := db.db.Exec(sql, canceledID, reason)
+	if err != nil {
+		return result, err
+	}
+	return result, err
+
+}
+
+func (db *DB) deleteDay(id int) (sql.Result, error) {
+	sql := "DELETE FROM day WHERE id = ?;"
+	result, err := db.db.Exec(sql, id)
+	if err != nil {
+		return result, err
+	}
+	return result, err
+
+}
+
+func (db *DB) deleteDayWhere(canceledID int, reason string) (sql.Result, error) {
+	sql := "DELETE FROM day WHERE canceled_class_id = ? AND day = ?;"
+	result, err := db.db.Exec(sql, canceledID, reason)
+	if err != nil {
+		return result, err
+	}
+	return result, err
+
+}

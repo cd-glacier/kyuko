@@ -9,6 +9,8 @@ type TestData struct {
 	Delete              KyukoData
 	ShowID              CanceledClass
 	Add                 CanceledClass
+	Reason              Reason
+	Day                 Day
 }
 
 var db DB
@@ -23,7 +25,8 @@ func init() {
 	testData.ShowID = CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "ShowIDTest", Season: "spring", Instructor: "hoge man"}
 	testData.Delete = KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "Delete Test", Instructor: "tsetMan", Reason: "darui"}
 	testData.Add = CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "ADDTest", Season: "spring", Instructor: "hoge man"}
-
+	testData.Reason = Reason{CanceledClassID: 1, Reason: "darui"}
+	testData.Day = Day{CanceledClassID: 1, Date: "2016/09/26"}
 }
 
 func deleteTestData() {
@@ -37,6 +40,9 @@ func deleteTestData() {
 	db.deleteCanceled(id)
 	id, _ = db.ShowCanceledClassID(testData.Add)
 	db.deleteCanceled(id)
+
+	db.deleteReasonWhere(testData.Reason.CanceledClassID, testData.Reason.Reason)
+	db.deleteDayWhere(testData.Day.CanceledClassID, testData.Day.Date)
 }
 
 func TestConnectDB(t *testing.T) {
@@ -71,9 +77,7 @@ func TestReason(t *testing.T) {
 	defer deleteTestData()
 	var err error
 
-	testData := Reason{CanceledClassID: 1, Reason: "darui"}
-
-	_, err = db.InsertReason(testData)
+	_, err = db.InsertReason(testData.Reason)
 	if err != nil {
 		t.Fatalf("reason の insert に失敗\n%s", err)
 	}
@@ -83,9 +87,7 @@ func TestDay(t *testing.T) {
 	defer deleteTestData()
 	var err error
 
-	testData := Day{CanceledClassID: 1, Date: "2016/09/26"}
-
-	_, err = db.InsertDay(testData)
+	_, err = db.InsertDay(testData.Day)
 	if err != nil {
 		t.Fatalf("day の insert に失敗\n%s", err)
 	}
