@@ -65,23 +65,46 @@ func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		canceledClass, err := model.KyukoToCanceled(data)
+		if err != nil {
+			return nil, err
+		}
+
+		//挿入するデータが存在するのか確認
+		id, err := db.ShowCanceledClassID(canceledClass)
+		if err != nil {
+			return nil, err
+		}
+
+		//DBに存在するデータかつ今日のデータでないなら
+		if isExist, _ := db.IsExistToday(data); id != -1 && !isExist {
+			canceledClass.ID = id
+			_, err = db.AddCanceled(canceledClass.ID)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		_, err = db.InsertCanceledClass(canceledClass)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	//tws, err := twitter.CreateContent(kyukoData)
-	_, err = twitter.CreateContent(kyukoData)
+	tws, err := twitter.CreateContent(kyukoData)
+	//_, err = twitter.CreateContent(kyukoData)
 	if err != nil {
 		return nil, err
 	}
 
-	/*
-		for _, tw := range tws {
-			err := twitter.Update(client, tw)
-			if err != nil {
-				return nil, err
-				return nil, err
-			}
+	for _, tw := range tws {
+		err := twitter.Update(client, tw)
+		if err != nil {
+			return nil, err
+			return nil, err
 		}
-	*/
+	}
 
 	return kyukoData, nil
 }

@@ -3,6 +3,8 @@ package model
 import (
 	"database/sql"
 	"errors"
+	"strconv"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -28,9 +30,9 @@ func (db *DB) Insert(k KyukoData) (sql.Result, error) {
 }
 
 func (db *DB) InsertCanceledClass(c CanceledClass) (sql.Result, error) {
-	sql := "INSERT INTO `canceled_class` (canceled, place, week, period, year, season, class_name, instructor) VALUES(?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `canceled`=?;"
+	sql := "INSERT INTO `canceled_class` (canceled, place, week, period, year, season, class_name, instructor) VALUES(?, ?, ?, ?, ?, ?, ?, ?);"
 
-	result, err := db.db.Exec(sql, c.Canceled, c.Place, c.Weekday, c.Period, c.Year, c.Season, c.ClassName, c.Instructor, c.Canceled)
+	result, err := db.db.Exec(sql, c.Canceled, c.Place, c.Weekday, c.Period, c.Year, c.Season, c.ClassName, c.Instructor)
 	return result, err
 }
 
@@ -107,10 +109,128 @@ func (db *DB) ShowCanceledClassID(c CanceledClass) (int, error) {
 	return canceledclass[0].ID, nil
 }
 
+func (db *DB) IsExistToday(k KyukoData) (bool, error) {
+	sql := "select * from kyuko_data where class_name=? and day=?"
+	rows, err := db.db.Query(sql, k.ClassName, k.Day)
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+	kyukoData := []KyukoData{}
+	kyukoData, err = ScanAll(rows)
+	if err != nil {
+		return false, err
+	}
+
+	if len(kyukoData) > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
 func (db *DB) DeleteWhereDayAndClassName(day, className string) (sql.Result, error) {
 	result, err := db.db.Exec("delete from kyuko_data where day = ? and class_name = ?", day, className)
 	if err != nil {
 		return result, err
 	}
 	return result, err
+}
+
+func (db *DB) AddCanceled(id int) (sql.Result, error) {
+	sql := "UPDATE canceled_class SET canceled = canceled+1 WHERE id = ?;"
+	result, err := db.db.Exec(sql, id)
+	if err != nil {
+		return result, err
+	}
+	return result, err
+}
+
+func KyukoToCanceled(k KyukoData) (CanceledClass, error) {
+	season, err := getSeason(k.Day)
+	if err != nil {
+		return CanceledClass{}, err
+	}
+
+	year, err := getYear(k.Day)
+	if err != nil {
+		return CanceledClass{}, err
+	}
+
+	return CanceledClass{
+		Place:      k.Place,
+		Weekday:    k.Weekday,
+		Period:     k.Period,
+		ClassName:  k.ClassName,
+		Instructor: k.Instructor,
+		Season:     season,
+		Year:       year,
+	}, nil
+}
+
+func getYear(day string) (int, error) {
+	strYear := strings.Split(day, "/")[0]
+	year, _ := strconv.Atoi(strYear)
+	return year, nil
+}
+
+func getSeason(day string) (string, error) {
+	strMonth := strings.Split(day, "/")[1]
+	month, _ := strconv.Atoi(strMonth)
+
+	if month >= 3 && month <= 8 {
+		return "spring", nil
+	} else if (month >= 9 && month <= 12) || (month >= 1 && month <= 2) {
+		return "autumn", nil
+	}
+
+	return "", errors.New("Season are not uniquely determined")
+}
+
+func (db *DB) deleteCanceled(id int) (sql.Result, error) {
+	sql := "DELETE FROM canceled_class WHERE id = ?;"
+	result, err := db.db.Exec(sql, id)
+	if err != nil {
+		return result, err
+	}
+	return result, err
+}
+
+func (db *DB) deleteReason(id int) (sql.Result, error) {
+	sql := "DELETE FROM reason WHERE id = ?;"
+	result, err := db.db.Exec(sql, id)
+	if err != nil {
+		return result, err
+	}
+	return result, err
+
+}
+
+func (db *DB) deleteReasonWhere(canceledID int, reason string) (sql.Result, error) {
+	sql := "DELETE FROM reason WHERE canceled_class_id = ? AND reason = ?;"
+	result, err := db.db.Exec(sql, canceledID, reason)
+	if err != nil {
+		return result, err
+	}
+	return result, err
+
+}
+
+func (db *DB) deleteDay(id int) (sql.Result, error) {
+	sql := "DELETE FROM day WHERE id = ?;"
+	result, err := db.db.Exec(sql, id)
+	if err != nil {
+		return result, err
+	}
+	return result, err
+
+}
+
+func (db *DB) deleteDayWhere(canceledID int, reason string) (sql.Result, error) {
+	sql := "DELETE FROM day WHERE canceled_class_id = ? AND day = ?;"
+	result, err := db.db.Exec(sql, canceledID, reason)
+	if err != nil {
+		return result, err
+	}
+	return result, err
+
 }

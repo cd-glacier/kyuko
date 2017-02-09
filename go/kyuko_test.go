@@ -20,10 +20,10 @@ var (
 )
 
 func testExec(t *testing.T) {
-
 	tClient := twitter.NewTwitterClient(T_CONSUMER_KEY, T_CONSUMER_SECRET, T_ACCESS_TOKEN, T_ACCESS_TOKEN_SECRET)
-	err := Exec(2, tClient)
+	_, err := Exec(2, tClient)
 	if err != nil {
 		t.Fatalf("%s", err)
 	}
+
 }
