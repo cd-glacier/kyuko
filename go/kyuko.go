@@ -10,6 +10,36 @@ import (
 	"github.com/g-hyoga/kyuko/go/twitter"
 )
 
+func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
+	var kyukoData []model.KyukoData
+
+	weekday := weekdayToday()
+
+	doc, err := readHTML(place, weekday)
+	if err != nil {
+		return kyukoData, err
+	}
+
+	kyukoData, err = scraper(doc)
+	if err != nil {
+		return kyukoData, err
+	}
+
+	err = manageDB(kyukoData)
+	if err != nil {
+		return kyukoData, err
+	}
+
+	/*
+		err = manageTwitter(kyukoData)
+		if err != nil {
+		return kyukoData, err
+		}
+	*/
+
+	return kyukoData, nil
+}
+
 func weekdayToday() int {
 	//今日の曜日
 	weekday := int(time.Now().Weekday())
@@ -26,25 +56,26 @@ func weekdayToday() int {
 	return weekday
 }
 
-func scraper(place, weekday int) ([]model.KyukoData, error) {
+func readHTML(place, weekday int) (*goquery.Document, error) {
 	//第一引数:校地
 	//第二引数:曜日
 	url, err := scrape.SetUrl(place, weekday)
 	if err != nil {
 		return nil, err
 	}
-
 	//http
 	reader, err := scrape.Get(url)
 	if err != nil {
 		return nil, err
 	}
-
 	doc, err := goquery.NewDocumentFromReader(reader)
 	if err != nil {
 		return nil, err
 	}
+	return doc, err
+}
 
+func scraper(doc *goquery.Document) ([]model.KyukoData, error) {
 	kyukoData, err := scrape.Scrape(doc)
 	if err != nil {
 		return nil, err
@@ -52,9 +83,9 @@ func scraper(place, weekday int) ([]model.KyukoData, error) {
 	return kyukoData, nil
 }
 
-func ManageDB(kyukoData []model.KyukoData) error {
+func manageDB(kyukoData []model.KyukoData) error {
 	var db model.DB
-	err = db.Connect()
+	err := db.Connect()
 	if err != nil {
 		return err
 	}
@@ -62,7 +93,6 @@ func ManageDB(kyukoData []model.KyukoData) error {
 
 	for _, data := range kyukoData {
 		_, err = db.Insert(data)
-		kyukoResult = append(kyukoResult, data)
 		if err != nil {
 			return err
 		}
@@ -85,19 +115,22 @@ func ManageDB(kyukoData []model.KyukoData) error {
 			if err != nil {
 				return err
 			}
+			//reason, dayにも追加
+
+			//dbにない時
+		} else if id == -1 {
+			_, err = db.InsertCanceledClass(canceledClass)
+			if err != nil {
+				return err
+			}
 		}
 
-		_, err = db.InsertCanceledClass(canceledClass)
-		if err != nil {
-			return err
-		}
 	}
 	return nil
 }
 
-func manageTwitter(kyukoData model.KyukoData) error {
+func manageTwitter(kyukoData []model.KyukoData, client *goTwitter.Client) error {
 	tws, err := twitter.CreateContent(kyukoData)
-	//_, err = twitter.CreateContent(kyukoData)
 	if err != nil {
 		return err
 	}
@@ -110,29 +143,4 @@ func manageTwitter(kyukoData model.KyukoData) error {
 	}
 
 	return nil
-}
-
-// scrapingを実行してデータベースに保存する
-// その後twitterに投稿
-func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
-	var kyukoResult []model.KyukoData
-
-	weekday := weekdayToday()
-
-	kyukoData, err := scraper(place, weekday)
-	if err != nil {
-		return kyukoResult, err
-	}
-
-	err := manageDB(kyuokData)
-	if err != nil {
-		return kyukoResult, err
-	}
-
-	err := manageTwitter(kyukoData)
-	if err != nil {
-		return kyukoResult, err
-	}
-
-	return kyukoData, nil
 }

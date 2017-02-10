@@ -89,6 +89,9 @@ func (db *DB) SelectAll() ([]KyukoData, error) {
 	return kyukoData, err
 }
 
+// DBからIDを取得します。
+// 存在しない場合は-1を返します
+// 一意に定まらない場合はerrorを返します
 func (db *DB) ShowCanceledClassID(c CanceledClass) (int, error) {
 	sql := "select * from canceled_class where class_name=? and year=? and season = ?"
 	rows, err := db.db.Query(sql, c.ClassName, c.Year, c.Season)
@@ -101,10 +104,11 @@ func (db *DB) ShowCanceledClassID(c CanceledClass) (int, error) {
 	if err != nil {
 		return -1, err
 	}
-	if len(canceledclass) != 1 {
+
+	if len(canceledclass) != 1 && len(canceledclass) != 0 {
 		return -1, errors.New("IDが一意に定まりませんでした")
 	} else if len(canceledclass) == 0 {
-		return -1, errors.New("DBに存在しないデータです")
+		return -1, nil
 	}
 	return canceledclass[0].ID, nil
 }
