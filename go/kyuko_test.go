@@ -19,6 +19,11 @@ var (
 	I_ACCESS_TOKEN_SECRET = os.Getenv("I_ACCESS_TOKEN_SECRET")
 )
 
+const (
+	KYUKOFILE   = "./testdata/kyuko.html"
+	NOKYUKOFILE = "./testdata/not_kyuko.html"
+)
+
 func testExec(t *testing.T) {
 	tClient := twitter.NewTwitterClient(T_CONSUMER_KEY, T_CONSUMER_SECRET, T_ACCESS_TOKEN, T_ACCESS_TOKEN_SECRET)
 	_, err := Exec(2, tClient)
