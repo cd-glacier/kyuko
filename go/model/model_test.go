@@ -37,11 +37,11 @@ func deleteTestData() {
 	db.DeleteWhereDayAndClassName("2016/09/26", "Delete Test")
 
 	id, _ := db.ShowCanceledClassID(testData.InsertCanceledClass)
-	db.deleteCanceled(id)
+	db.DeleteCanceled(id)
 	id, _ = db.ShowCanceledClassID(testData.ShowID)
-	db.deleteCanceled(id)
+	db.DeleteCanceled(id)
 	id, _ = db.ShowCanceledClassID(testData.Add)
-	db.deleteCanceled(id)
+	db.DeleteCanceled(id)
 
 	db.DeleteReasonWhere(testData.Reason.CanceledClassID, testData.Reason.Reason)
 	db.DeleteDayWhere(testData.Day.CanceledClassID, testData.Day.Date)

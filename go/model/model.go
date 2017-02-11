@@ -209,7 +209,7 @@ func getSeason(day string) (string, error) {
 	return "", errors.New("Season are not uniquely determined")
 }
 
-func (db *DB) deleteCanceled(id int) (sql.Result, error) {
+func (db *DB) DeleteCanceled(id int) (sql.Result, error) {
 	sql := "DELETE FROM canceled_class WHERE id = ?;"
 	result, err := db.db.Exec(sql, id)
 	if err != nil {

@@ -67,13 +67,13 @@ func deleteTestData() {
 	}
 
 	for id := 254; id <= 257; id++ {
+		db.DeleteCanceled(id)
 		db.DeleteDayWhere(id, testDay)
 	}
 }
 
 func init() {
 	db.Connect()
-	defer db.Close()
 	kyukoReader, _ := EncodeTestFile(KYUKOFILE)
 	kyukoDoc, _ = goquery.NewDocumentFromReader(kyukoReader)
 
@@ -121,6 +121,8 @@ func TestExec(t *testing.T) {
 		t.Fatalf("Error TestExec: once \n want: %v\n got:  %v", testData, kyukoData)
 	}
 
+	//canceled_classのcanceledが1かどうか
+
 	//二回目のInsert
 	//何もInsertして欲しくない
 	err = manageDB(kyukoData)
@@ -130,6 +132,8 @@ func TestExec(t *testing.T) {
 	if !reflect.DeepEqual(kyukoData, testData) {
 		t.Fatalf("Error TestExec: once \n want: %v\n got:  %v", testData, kyukoData)
 	}
+
+	//canceled_classのcanceledが2かどうか
 
 	// 三回目のInsert日付を変えて
 	// 別の日のデータとして扱う
@@ -150,4 +154,5 @@ func TestExec(t *testing.T) {
 		t.Fatalf("Error TestExec: twice \n want: %v\n got:  %v", testData, kyukoData)
 	}
 
+	//canceled_classのcanceledが3かどうか
 }
