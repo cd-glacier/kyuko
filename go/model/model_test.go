@@ -8,7 +8,7 @@ type TestData struct {
 	SelectAll           KyukoData
 	Delete              KyukoData
 	ShowID              CanceledClass
-	IsExistToday        KyukoData
+	IsExistToday        Day
 	Add                 CanceledClass
 	Reason              Reason
 	Day                 Day
@@ -24,7 +24,7 @@ func init() {
 	testData.InsertCanceledClass = CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "CanceledClass", Season: "spring", Instructor: "hoge man"}
 	testData.SelectAll = KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "SelectAll Test", Instructor: "tsetMan", Reason: "darui"}
 	testData.ShowID = CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "ShowIDTest", Season: "spring", Instructor: "hoge man"}
-	testData.IsExistToday = KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/11/11", ClassName: "IsExistToday Test", Instructor: "tsetMan", Reason: "darui"}
+	testData.IsExistToday = Day{CanceledClassID: 3, Date: "2016/02/16"}
 	testData.Delete = KyukoData{Place: 1, Weekday: 1, Period: 1, Day: "2016/09/26", ClassName: "Delete Test", Instructor: "tsetMan", Reason: "darui"}
 	testData.Add = CanceledClass{Canceled: 10, Place: 1, Weekday: 1, Period: 1, Year: 2016, ClassName: "ADDTest", Season: "spring", Instructor: "hoge man"}
 	testData.Reason = Reason{CanceledClassID: 1, Reason: "darui"}
@@ -35,7 +35,6 @@ func deleteTestData() {
 	db.DeleteWhereDayAndClassName("2016/09/26", "Insert Test")
 	db.DeleteWhereDayAndClassName("2016/09/26", "SelectAll Test")
 	db.DeleteWhereDayAndClassName("2016/09/26", "Delete Test")
-	db.DeleteWhereDayAndClassName("2016/11/11", "IsExistToday Test")
 
 	id, _ := db.ShowCanceledClassID(testData.InsertCanceledClass)
 	db.deleteCanceled(id)
@@ -44,8 +43,9 @@ func deleteTestData() {
 	id, _ = db.ShowCanceledClassID(testData.Add)
 	db.deleteCanceled(id)
 
-	db.deleteReasonWhere(testData.Reason.CanceledClassID, testData.Reason.Reason)
-	db.deleteDayWhere(testData.Day.CanceledClassID, testData.Day.Date)
+	db.DeleteReasonWhere(testData.Reason.CanceledClassID, testData.Reason.Reason)
+	db.DeleteDayWhere(testData.Day.CanceledClassID, testData.Day.Date)
+	db.DeleteDayWhere(testData.IsExistToday.CanceledClassID, testData.IsExistToday.Date)
 }
 
 func TestConnectDB(t *testing.T) {
@@ -135,16 +135,16 @@ func TestIsExistToday(t *testing.T) {
 	defer deleteTestData()
 	var err error
 
-	if isExist, err := db.IsExistToday(testData.IsExistToday); isExist || err != nil {
+	if isExist, err := db.IsExistToday(3, "2016/02/16"); isExist || err != nil {
 		t.Fatalf("Faleid IsExistToday\n%s", err)
 	}
 
-	_, err = db.Insert(testData.IsExistToday)
+	_, err = db.InsertDay(testData.IsExistToday)
 	if err != nil {
-		t.Fatalf("Error IsExistToday: failed Insert func\n%s", err)
+		t.Fatalf("Error IsExistToday: Failed InsertDay func\n%s", err)
 	}
 
-	if isExist, err := db.IsExistToday(testData.IsExistToday); !isExist || err != nil {
+	if isExist, err := db.IsExistToday(3, "2016/02/16"); !isExist || err != nil {
 		t.Fatalf("Faleid IsExistToday\n%s", err)
 	}
 

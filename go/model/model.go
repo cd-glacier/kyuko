@@ -75,6 +75,19 @@ func ScanCanceledClass(rows *sql.Rows) ([]CanceledClass, error) {
 
 }
 
+func ScanDay(rows *sql.Rows) ([]Day, error) {
+	days := []Day{}
+	var err error
+	for rows.Next() {
+		var d Day
+		if err = rows.Scan(&d.ID, &d.CanceledClassID, &d.Date); err != nil {
+			return days, err
+		}
+		days = append(days, d)
+	}
+	return days, err
+}
+
 func (db *DB) SelectAll() ([]KyukoData, error) {
 	kyukoData := []KyukoData{}
 	rows, err := db.db.Query("select * from kyuko_data where id in(select min(id) from kyuko_data group by class_name, day)")
@@ -113,20 +126,26 @@ func (db *DB) ShowCanceledClassID(c CanceledClass) (int, error) {
 	return canceledclass[0].ID, nil
 }
 
-func (db *DB) IsExistToday(k KyukoData) (bool, error) {
-	sql := "select * from kyuko_data where class_name=? and day=?"
-	rows, err := db.db.Query(sql, k.ClassName, k.Day)
+// Dayテーブルをみて今日の日付があるのか確認
+func (db *DB) IsExistToday(id int, date string) (bool, error) {
+	sql := "select * from day where canceled_class_id=?"
+	rows, err := db.db.Query(sql, id)
 	if err != nil {
 		return false, err
 	}
 	defer rows.Close()
-	kyukoData := []KyukoData{}
-	kyukoData, err = ScanAll(rows)
+	days := []Day{}
+	days, err = ScanDay(rows)
 	if err != nil {
 		return false, err
 	}
 
-	if len(kyukoData) > 0 {
+	if len(days) > 1 {
+		return false, errors.New("dayテーブルに重複したデータが存在します")
+	}
+
+	//dayが今日の日付か
+	if len(days) == 1 && days[0].Date == date {
 		return true, nil
 	}
 	return false, nil
@@ -209,7 +228,7 @@ func (db *DB) deleteReason(id int) (sql.Result, error) {
 
 }
 
-func (db *DB) deleteReasonWhere(canceledID int, reason string) (sql.Result, error) {
+func (db *DB) DeleteReasonWhere(canceledID int, reason string) (sql.Result, error) {
 	sql := "DELETE FROM reason WHERE canceled_class_id = ? AND reason = ?;"
 	result, err := db.db.Exec(sql, canceledID, reason)
 	if err != nil {
@@ -229,9 +248,9 @@ func (db *DB) deleteDay(id int) (sql.Result, error) {
 
 }
 
-func (db *DB) deleteDayWhere(canceledID int, reason string) (sql.Result, error) {
+func (db *DB) DeleteDayWhere(canceledID int, day string) (sql.Result, error) {
 	sql := "DELETE FROM day WHERE canceled_class_id = ? AND day = ?;"
-	result, err := db.db.Exec(sql, canceledID, reason)
+	result, err := db.db.Exec(sql, canceledID, day)
 	if err != nil {
 		return result, err
 	}

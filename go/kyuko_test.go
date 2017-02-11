@@ -65,6 +65,10 @@ func deleteTestData() {
 	for _, className := range testNames {
 		db.DeleteWhereDayAndClassName(testDay, className)
 	}
+
+	for id := 254; id <= 257; id++ {
+		db.DeleteDayWhere(id, testDay)
+	}
 }
 
 func init() {
@@ -108,12 +112,42 @@ func TestExec(t *testing.T) {
 		t.Fatalf("Error Exec: Failed scraper func \n%s", err)
 	}
 
+	//一回目のInsert
 	err = manageDB(kyukoData)
 	if err != nil {
 		t.Fatalf("Error Exec: Failed manageDB func \n%s", err)
 	}
-
 	if !reflect.DeepEqual(kyukoData, testData) {
-		t.Fatalf("Error TestExec \n want: %v\n got:  %v", testData, kyukoData)
+		t.Fatalf("Error TestExec: once \n want: %v\n got:  %v", testData, kyukoData)
 	}
+
+	//二回目のInsert
+	//何もInsertして欲しくない
+	err = manageDB(kyukoData)
+	if err != nil {
+		t.Fatalf("Error Exec: Failed manageDB func \n%s", err)
+	}
+	if !reflect.DeepEqual(kyukoData, testData) {
+		t.Fatalf("Error TestExec: once \n want: %v\n got:  %v", testData, kyukoData)
+	}
+
+	// 三回目のInsert日付を変えて
+	// 別の日のデータとして扱う
+	// reason, dayテーブルにInsertされて
+	// canceledカラムが1増えれば良い
+	for _, data := range kyukoData {
+		data.Day = "2016/10/12"
+	}
+	for _, data := range testData {
+		data.Day = "2016/10/12"
+	}
+
+	err = manageDB(kyukoData)
+	if err != nil {
+		t.Fatalf("Error Exec: Failed manageDB func \n%s", err)
+	}
+	if !reflect.DeepEqual(kyukoData, testData) {
+		t.Fatalf("Error TestExec: twice \n want: %v\n got:  %v", testData, kyukoData)
+	}
+
 }
