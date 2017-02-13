@@ -125,7 +125,7 @@ func TestShowCanceledClassID(t *testing.T) {
 		t.Fatalf("Show canceled class id に失敗\n%s", err)
 	}
 
-	_, err = db.deleteCanceled(id)
+	_, err = db.DeleteCanceled(id)
 	if err != nil {
 		t.Fatalf("Error ShowCanceledClassID: failed DeleteCnacled func\n%s", err)
 	}

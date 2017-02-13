@@ -136,6 +136,21 @@ func manageDB(kyukoData []model.KyukoData) error {
 			if err != nil {
 				return err
 			}
+			id, err = db.ShowCanceledClassID(canceledClass)
+			if err != nil {
+				return err
+			}
+			//reason, dayにも追加
+			r := model.Reason{CanceledClassID: id, Reason: data.Reason}
+			_, err = db.InsertReason(r)
+			if err != nil {
+				return err
+			}
+			d := model.Day{CanceledClassID: id, Date: data.Day}
+			_, err := db.InsertDay(d)
+			if err != nil {
+				return err
+			}
 		} else {
 			fmt.Println("today data")
 		}

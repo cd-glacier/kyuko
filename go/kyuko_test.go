@@ -1,6 +1,7 @@
 package kyuko
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -66,7 +67,7 @@ func deleteTestData() {
 		db.DeleteWhereDayAndClassName(testDay, className)
 	}
 
-	for id := 254; id <= 257; id++ {
+	for id := 258; id <= 261; id++ {
 		db.DeleteCanceled(id)
 		db.DeleteDayWhere(id, testDay)
 	}
@@ -141,7 +142,9 @@ func TestExec(t *testing.T) {
 	// canceledカラムが1増えれば良い
 	for _, data := range kyukoData {
 		data.Day = "2016/10/12"
+		fmt.Println(data)
 	}
+	fmt.Println(kyukoData)
 	for _, data := range testData {
 		data.Day = "2016/10/12"
 	}
