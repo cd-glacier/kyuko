@@ -1,7 +1,6 @@
 package kyuko
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -111,7 +110,6 @@ func manageDB(kyukoData []model.KyukoData) error {
 
 		//DBに存在するデータで今日のデータでないなら
 		if isExist, _ := db.IsExistToday(id, data.Day); id != -1 && !isExist {
-			fmt.Println("not today && not DB")
 			canceledClass.ID = id
 			_, err = db.AddCanceled(canceledClass.ID)
 			if err != nil {
@@ -130,7 +128,6 @@ func manageDB(kyukoData []model.KyukoData) error {
 			}
 			//dbにない時
 		} else if id == -1 {
-			fmt.Println("new data")
 			canceledClass.Canceled = 1
 			_, err = db.InsertCanceledClass(canceledClass)
 			if err != nil {
@@ -151,8 +148,6 @@ func manageDB(kyukoData []model.KyukoData) error {
 			if err != nil {
 				return err
 			}
-		} else {
-			fmt.Println("today data")
 		}
 
 	}

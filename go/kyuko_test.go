@@ -1,7 +1,6 @@
 package kyuko
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -21,7 +20,9 @@ var (
 	kyukoDoc, noKyukoDoc *goquery.Document
 	testData             []model.KyukoData
 	testDay              string
+	testDay2             string
 	testNames            []string
+	testReasons          []string
 
 	T_CONSUMER_KEY        = os.Getenv("T_CONSUMER_KEY")
 	T_CONSUMER_SECRET     = os.Getenv("T_CONSUMER_SECRET")
@@ -63,13 +64,15 @@ func EncodeTestFile(fileName string) (io.Reader, error) {
 }
 
 func deleteTestData() {
-	for _, className := range testNames {
+	for i, className := range testNames {
 		db.DeleteWhereDayAndClassName(testDay, className)
-	}
 
-	for id := 258; id <= 261; id++ {
+		id, _ := db.ShowCanceledClassID(model.CanceledClass{ClassName: className, Year: 2016, Season: "autumn"})
+
 		db.DeleteCanceled(id)
+		db.DeleteReasonWhere(id, testReasons[i])
 		db.DeleteDayWhere(id, testDay)
+		db.DeleteDayWhere(id, testDay2)
 	}
 }
 
@@ -83,11 +86,12 @@ func init() {
 
 	//正解データの用意
 	testPeriods := []int{2, 2, 2, 5}
-	testReasons := []string{"公務", "出張", "公務", ""}
+	testReasons = []string{"公務", "出張", "公務", ""}
 	testNames = []string{"環境生理学", "電気・電子計測Ｉ－１", "応用数学ＩＩ－１", "イングリッシュ・セミナー２－７０２"}
 	testInstructors := []string{"福岡義之", "松川真美", "大川領", "稲垣俊史"}
 	testPlace := 2
 	testDay = "2016/10/10"
+	testDay2 = "2016/10/12"
 	testWeekday := 1
 
 	for i := range testPeriods {
@@ -140,13 +144,11 @@ func TestExec(t *testing.T) {
 	// 別の日のデータとして扱う
 	// reason, dayテーブルにInsertされて
 	// canceledカラムが1増えれば良い
-	for _, data := range kyukoData {
-		data.Day = "2016/10/12"
-		fmt.Println(data)
+	for i, _ := range kyukoData {
+		kyukoData[i].Day = testDay2
 	}
-	fmt.Println(kyukoData)
-	for _, data := range testData {
-		data.Day = "2016/10/12"
+	for i, _ := range testData {
+		testData[i].Day = testDay2
 	}
 
 	err = manageDB(kyukoData)
