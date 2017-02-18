@@ -126,6 +126,26 @@ func (db *DB) ShowCanceledClassID(c CanceledClass) (int, error) {
 	return canceledclass[0].ID, nil
 }
 
+func (db *DB) ShowCanceled(id int) (int, error) {
+	sql := "select * from canceled_class where id=?;"
+	rows, err := db.db.Query(sql, id)
+	if err != nil {
+		return -1, err
+	}
+	defer rows.Close()
+	canceledclass := []CanceledClass{}
+	canceledclass, err = ScanCanceledClass(rows)
+	if err != nil {
+		return -1, err
+	}
+	if len(canceledclass) != 1 && len(canceledclass) != 0 {
+		return -1, errors.New("IDが一意に定まりませんでした")
+	} else if len(canceledclass) == 0 {
+		return -1, nil
+	}
+	return canceledclass[0].Canceled, nil
+}
+
 // Dayテーブルをみて今日の日付があるのか確認
 func (db *DB) IsExistToday(id int, date string) (bool, error) {
 	sql := "select * from day where canceled_class_id=?"
