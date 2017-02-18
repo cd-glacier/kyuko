@@ -82,8 +82,7 @@ func scraper(doc *goquery.Document) ([]model.KyukoData, error) {
 }
 
 //Reason, Dayは一緒に扱う事が多いので
-func insertReasonDay(id int, reason, day string) error {
-	var db model.DB
+func insertReasonDay(db model.DB, id int, reason, day string) error {
 	r := model.Reason{CanceledClassID: id, Reason: reason}
 	_, err := db.InsertReason(r)
 	if err != nil {
@@ -130,7 +129,7 @@ func manageDB(kyukoData []model.KyukoData) error {
 				return err
 			}
 			//reason, dayにも追加
-			err = insertReasonDay(id, data.Reason, data.Day)
+			err = insertReasonDay(db, id, data.Reason, data.Day)
 			if err != nil {
 				return err
 			}
@@ -147,7 +146,7 @@ func manageDB(kyukoData []model.KyukoData) error {
 				return err
 			}
 			//reason, dayにも追加
-			err = insertReasonDay(id, data.Reason, data.Day)
+			err = insertReasonDay(db, id, data.Reason, data.Day)
 			if err != nil {
 				return err
 			}

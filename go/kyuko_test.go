@@ -154,70 +154,28 @@ func reproducer(op int) error {
 func TestExec(t *testing.T) {
 	defer deleteTestData()
 
-	//一回目のテスト
-	err := reproducer(1)
-	if err != nil {
-		t.Fatalf("error testexec: failed reproducer func\n%s", err)
-	}
+	canceledAnswer := []int{1, 1, 2}
 
-	//canceled_classのcanceledが1かどうか
-	for i, _ := range testData {
-		c, err := model.KyukoToCanceled(testData[i])
+	for j, ans := range canceledAnswer {
+		//j+1回目のテスト
+		err := reproducer(j + 1)
 		if err != nil {
-			t.Fatalf("Error TestExec: Failed KyukoToCanceled func\n%s", err)
+			t.Fatalf("error testexec: failed reproducer func\n%s", err)
 		}
-		canceled, err := showCanceled(c)
-		if err != nil {
-			t.Fatalf("Error TestExec: Failed showCanceled func\n%s", err)
-		}
-		if canceled != 1 {
-			t.Fatalf("Error TestExec: canceled in DB\n want: %s\n got:  %s\n", 1, canceled)
-		}
-	}
 
-	//二回目のテスト
-	//重複データを与えているので何もInsertして欲しくない
-	err = reproducer(2)
-	if err != nil {
-		t.Fatalf("error testexec: failed reproducer func\n%s", err)
-	}
-
-	//canceled_classのcanceledが1かどうか
-	for i, _ := range testData {
-		c, err := model.KyukoToCanceled(testData[i])
-		if err != nil {
-			t.Fatalf("Error TestExec: Failed KyukoToCanceled func\n%s", err)
-		}
-		canceled, err := showCanceled(c)
-		if err != nil {
-			t.Fatalf("Error TestExec: Failed isCorrectCanceled func\n%s", err)
-		}
-		if canceled != 1 {
-			t.Fatalf("Error TestExec: canceled in DB\n want: %s\n got:  %s\n", 1, canceled)
-		}
-	}
-
-	// 三回目のInsert日付を変えて
-	// 別の日のデータとして扱う
-	// reason, dayテーブルにInsertされて
-	// canceledカラムが1増えれば良い
-	err = reproducer(3)
-	if err != nil {
-		t.Fatalf("error testexec: failed reproducer func\n%s", err)
-	}
-
-	//canceled_classのcanceledが2かどうか
-	for i, _ := range testData {
-		c, err := model.KyukoToCanceled(testData[i])
-		if err != nil {
-			t.Fatalf("Error TestExec: Failed KyukoToCanceled func\n%s", err)
-		}
-		canceled, err := showCanceled(c)
-		if err != nil {
-			t.Fatalf("Error TestExec: Failed isCorrectCanceled func\n%s", err)
-		}
-		if canceled != 2 {
-			t.Fatalf("Error TestExec: canceled in DB\n want: %s\n got:  %s\n", 2, canceled)
+		//canceled_classのcanceledがansかどうか
+		for i, _ := range testData {
+			c, err := model.KyukoToCanceled(testData[i])
+			if err != nil {
+				t.Fatalf("Error TestExec: Failed KyukoToCanceled func\n%s", err)
+			}
+			canceled, err := showCanceled(c)
+			if err != nil {
+				t.Fatalf("Error TestExec: Failed showCanceled func\n%s", err)
+			}
+			if canceled != ans {
+				t.Fatalf("Error TestExec: canceled in DB\n want: %s\n got:  %s\n", ans, canceled)
+			}
 		}
 	}
 
