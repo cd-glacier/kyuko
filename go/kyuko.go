@@ -30,12 +30,10 @@ func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
 		return kyukoData, err
 	}
 
-	/*
-		err = manageTwitter(kyukoData)
-		if err != nil {
+	err = manageTwitter(kyukoData)
+	if err != nil {
 		return kyukoData, err
-		}
-	*/
+	}
 
 	return kyukoData, nil
 }
