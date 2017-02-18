@@ -30,10 +30,12 @@ func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
 		return kyukoData, err
 	}
 
-	err = manageTwitter(kyukoData)
-	if err != nil {
-		return kyukoData, err
-	}
+	/*
+		err = manageTwitter(kyukoData, client)
+		if err != nil {
+			return kyukoData, err
+		}
+	*/
 
 	return kyukoData, nil
 }
@@ -81,6 +83,21 @@ func scraper(doc *goquery.Document) ([]model.KyukoData, error) {
 	return kyukoData, nil
 }
 
+//Reason, Dayは一緒に扱う事が多いので
+func insertReasonDay(id int, reason, day string) error {
+	r := model.Reason{CanceledClassID: id, Reason: reason}
+	_, err := db.InsertReason(r)
+	if err != nil {
+		return err
+	}
+	d := model.Day{CanceledClassID: id, Date: day}
+	_, err = db.InsertDay(d)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func manageDB(kyukoData []model.KyukoData) error {
 	var db model.DB
 	err := db.Connect()
@@ -114,16 +131,11 @@ func manageDB(kyukoData []model.KyukoData) error {
 				return err
 			}
 			//reason, dayにも追加
-			r := model.Reason{CanceledClassID: id, Reason: data.Reason}
-			_, err = db.InsertReason(r)
+			err = insertReasonDay(id, data.Reason, data.Day)
 			if err != nil {
 				return err
 			}
-			d := model.Day{CanceledClassID: id, Date: data.Day}
-			_, err := db.InsertDay(d)
-			if err != nil {
-				return err
-			}
+
 			//dbにない時
 		} else if id == -1 {
 			canceledClass.Canceled = 1
@@ -136,13 +148,7 @@ func manageDB(kyukoData []model.KyukoData) error {
 				return err
 			}
 			//reason, dayにも追加
-			r := model.Reason{CanceledClassID: id, Reason: data.Reason}
-			_, err = db.InsertReason(r)
-			if err != nil {
-				return err
-			}
-			d := model.Day{CanceledClassID: id, Date: data.Day}
-			_, err := db.InsertDay(d)
+			err = insertReasonDay(id, data.Reason, data.Day)
 			if err != nil {
 				return err
 			}
