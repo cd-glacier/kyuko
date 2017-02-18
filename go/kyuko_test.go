@@ -145,6 +145,9 @@ func reproducer(op int) error {
 	if !reflect.DeepEqual(kyukoData, testData) {
 		return errors.New("Error exec: not equal answer data")
 	}
+
+	//本当はここでTweet処理
+
 	return nil
 }
 
