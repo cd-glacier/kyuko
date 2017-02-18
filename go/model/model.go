@@ -75,6 +75,19 @@ func ScanCanceledClass(rows *sql.Rows) ([]CanceledClass, error) {
 
 }
 
+func ScanDay(rows *sql.Rows) ([]Day, error) {
+	days := []Day{}
+	var err error
+	for rows.Next() {
+		var d Day
+		if err = rows.Scan(&d.ID, &d.CanceledClassID, &d.Date); err != nil {
+			return days, err
+		}
+		days = append(days, d)
+	}
+	return days, err
+}
+
 func (db *DB) SelectAll() ([]KyukoData, error) {
 	kyukoData := []KyukoData{}
 	rows, err := db.db.Query("select * from kyuko_data where id in(select min(id) from kyuko_data group by class_name, day)")
@@ -89,6 +102,9 @@ func (db *DB) SelectAll() ([]KyukoData, error) {
 	return kyukoData, err
 }
 
+// DBからIDを取得します。
+// 存在しない場合は-1を返します
+// 一意に定まらない場合はerrorを返します
 func (db *DB) ShowCanceledClassID(c CanceledClass) (int, error) {
 	sql := "select * from canceled_class where class_name=? and year=? and season = ?"
 	rows, err := db.db.Query(sql, c.ClassName, c.Year, c.Season)
@@ -101,28 +117,55 @@ func (db *DB) ShowCanceledClassID(c CanceledClass) (int, error) {
 	if err != nil {
 		return -1, err
 	}
-	if len(canceledclass) != 1 {
+
+	if len(canceledclass) != 1 && len(canceledclass) != 0 {
 		return -1, errors.New("IDが一意に定まりませんでした")
 	} else if len(canceledclass) == 0 {
-		return -1, errors.New("DBに存在しないデータです")
+		return -1, nil
 	}
 	return canceledclass[0].ID, nil
 }
 
-func (db *DB) IsExistToday(k KyukoData) (bool, error) {
-	sql := "select * from kyuko_data where class_name=? and day=?"
-	rows, err := db.db.Query(sql, k.ClassName, k.Day)
+func (db *DB) ShowCanceled(id int) (int, error) {
+	sql := "select * from canceled_class where id=?;"
+	rows, err := db.db.Query(sql, id)
+	if err != nil {
+		return -1, err
+	}
+	defer rows.Close()
+	canceledclass := []CanceledClass{}
+	canceledclass, err = ScanCanceledClass(rows)
+	if err != nil {
+		return -1, err
+	}
+	if len(canceledclass) != 1 && len(canceledclass) != 0 {
+		return -1, errors.New("IDが一意に定まりませんでした")
+	} else if len(canceledclass) == 0 {
+		return -1, nil
+	}
+	return canceledclass[0].Canceled, nil
+}
+
+// Dayテーブルをみて今日の日付があるのか確認
+func (db *DB) IsExistToday(id int, date string) (bool, error) {
+	sql := "select * from day where canceled_class_id=?"
+	rows, err := db.db.Query(sql, id)
 	if err != nil {
 		return false, err
 	}
 	defer rows.Close()
-	kyukoData := []KyukoData{}
-	kyukoData, err = ScanAll(rows)
+	days := []Day{}
+	days, err = ScanDay(rows)
 	if err != nil {
 		return false, err
 	}
 
-	if len(kyukoData) > 0 {
+	if len(days) > 1 {
+		return false, errors.New("dayテーブルに重複したデータが存在します")
+	}
+
+	//dayが今日の日付か
+	if len(days) == 1 && days[0].Date == date {
 		return true, nil
 	}
 	return false, nil
@@ -186,7 +229,7 @@ func getSeason(day string) (string, error) {
 	return "", errors.New("Season are not uniquely determined")
 }
 
-func (db *DB) deleteCanceled(id int) (sql.Result, error) {
+func (db *DB) DeleteCanceled(id int) (sql.Result, error) {
 	sql := "DELETE FROM canceled_class WHERE id = ?;"
 	result, err := db.db.Exec(sql, id)
 	if err != nil {
@@ -205,7 +248,7 @@ func (db *DB) deleteReason(id int) (sql.Result, error) {
 
 }
 
-func (db *DB) deleteReasonWhere(canceledID int, reason string) (sql.Result, error) {
+func (db *DB) DeleteReasonWhere(canceledID int, reason string) (sql.Result, error) {
 	sql := "DELETE FROM reason WHERE canceled_class_id = ? AND reason = ?;"
 	result, err := db.db.Exec(sql, canceledID, reason)
 	if err != nil {
@@ -225,9 +268,9 @@ func (db *DB) deleteDay(id int) (sql.Result, error) {
 
 }
 
-func (db *DB) deleteDayWhere(canceledID int, reason string) (sql.Result, error) {
+func (db *DB) DeleteDayWhere(canceledID int, day string) (sql.Result, error) {
 	sql := "DELETE FROM day WHERE canceled_class_id = ? AND day = ?;"
-	result, err := db.db.Exec(sql, canceledID, reason)
+	result, err := db.db.Exec(sql, canceledID, day)
 	if err != nil {
 		return result, err
 	}
