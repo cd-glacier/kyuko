@@ -14,7 +14,7 @@ run:
 	./cmd/main
 
 test:
-	godep go test -v ./...
+	godep go test -v ./... | grep --color=auto -A 3 -e FAIL || echo "PASS ALL TEST"
 
 migrate/init:
 	#sudo service mysql restart
