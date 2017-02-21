@@ -138,7 +138,7 @@ func reproducer(op int) error {
 	}
 
 	//Insert
-	err = manageDB(kyukoData)
+	err = manageDB(kyukoData, db)
 	if err != nil {
 		return err
 	}
@@ -179,4 +179,12 @@ func TestExec(t *testing.T) {
 		}
 	}
 
+}
+
+// kyuko_data -> canceled, day, reason
+func testKyukoToCanceled(t *testing.T) {
+	err := kyukoToCanceled(db)
+	if err != nil {
+		t.Fatalf("Error\n%s\n", err)
+	}
 }

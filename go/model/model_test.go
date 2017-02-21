@@ -213,3 +213,10 @@ func TestGetSeason(t *testing.T) {
 		t.Fatal("Failed GetSeason func\n want: %s, got: %s", "spring", out)
 	}
 }
+
+func TestHoge(t *testing.T) {
+	err := hoge()
+	if err != nil {
+		t.Fatal("err \n%s", err)
+	}
+}
