@@ -90,7 +90,7 @@ func ScanDay(rows *sql.Rows) ([]Day, error) {
 
 func (db *DB) SelectAll() ([]KyukoData, error) {
 	kyukoData := []KyukoData{}
-	rows, err := db.db.Query("select * from kyuko_data;")
+	rows, err := db.db.Query("select * from kyuko_data where id in(select min(id) from kyuko_data group by class_name, day);")
 	if err != nil {
 		return kyukoData, err
 	}
