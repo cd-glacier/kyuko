@@ -174,7 +174,7 @@ func TestExec(t *testing.T) {
 				t.Fatalf("Error TestExec: Failed showCanceled func\n%s", err)
 			}
 			if canceled != ans {
-				t.Fatalf("Error TestExec: canceled in DB\n want: %s\n got:  %s\n", ans, canceled)
+				t.Fatalf("Error TestExec: canceled in DB, %vth test\n want: %s\n got:  %s\n", j+1, ans, canceled)
 			}
 		}
 	}
