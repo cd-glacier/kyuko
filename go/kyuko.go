@@ -25,7 +25,8 @@ func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
 		return kyukoData, err
 	}
 
-	err = manageDB(kyukoData)
+	var db model.DB
+	err = manageDB(kyukoData, db)
 	if err != nil {
 		return kyukoData, err
 	}
@@ -96,8 +97,7 @@ func insertReasonDay(db model.DB, id int, reason, day string) error {
 	return nil
 }
 
-func manageDB(kyukoData []model.KyukoData) error {
-	var db model.DB
+func manageDB(kyukoData []model.KyukoData, db model.DB) error {
 	err := db.Connect()
 	if err != nil {
 		return err
@@ -167,6 +167,20 @@ func manageTwitter(kyukoData []model.KyukoData, client *goTwitter.Client) error 
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func kyukoToCanceled(db model.DB) error {
+	k, err := db.SelectAll()
+	if err != nil {
+		return err
+	}
+
+	err = manageDB(k, db)
+	if err != nil {
+		return err
 	}
 
 	return nil

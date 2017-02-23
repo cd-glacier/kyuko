@@ -90,7 +90,7 @@ func ScanDay(rows *sql.Rows) ([]Day, error) {
 
 func (db *DB) SelectAll() ([]KyukoData, error) {
 	kyukoData := []KyukoData{}
-	rows, err := db.db.Query("select * from kyuko_data where id in(select min(id) from kyuko_data group by class_name, day)")
+	rows, err := db.db.Query("select * from kyuko_data where id in(select min(id) from kyuko_data group by class_name, day);")
 	if err != nil {
 		return kyukoData, err
 	}
@@ -160,14 +160,13 @@ func (db *DB) IsExistToday(id int, date string) (bool, error) {
 		return false, err
 	}
 
-	if len(days) > 1 {
-		return false, errors.New("dayテーブルに重複したデータが存在します")
+	//dayが今日の日付があるのか
+	for _, day := range days {
+		if day.Date == date {
+			return true, nil
+		}
 	}
 
-	//dayが今日の日付か
-	if len(days) == 1 && days[0].Date == date {
-		return true, nil
-	}
 	return false, nil
 }
 
@@ -217,7 +216,13 @@ func getYear(day string) (int, error) {
 }
 
 func getSeason(day string) (string, error) {
-	strMonth := strings.Split(day, "/")[1]
+	strMonth := ""
+	if strings.Contains(day, "-") {
+		strMonth = strings.Split(day, "-")[1]
+	} else {
+		strMonth = strings.Split(day, "/")[1]
+	}
+
 	month, _ := strconv.Atoi(strMonth)
 
 	if month >= 3 && month <= 8 {
@@ -245,7 +250,6 @@ func (db *DB) deleteReason(id int) (sql.Result, error) {
 		return result, err
 	}
 	return result, err
-
 }
 
 func (db *DB) DeleteReasonWhere(canceledID int, reason string) (sql.Result, error) {
@@ -255,7 +259,6 @@ func (db *DB) DeleteReasonWhere(canceledID int, reason string) (sql.Result, erro
 		return result, err
 	}
 	return result, err
-
 }
 
 func (db *DB) deleteDay(id int) (sql.Result, error) {
@@ -265,7 +268,6 @@ func (db *DB) deleteDay(id int) (sql.Result, error) {
 		return result, err
 	}
 	return result, err
-
 }
 
 func (db *DB) DeleteDayWhere(canceledID int, day string) (sql.Result, error) {
@@ -275,5 +277,4 @@ func (db *DB) DeleteDayWhere(canceledID int, day string) (sql.Result, error) {
 		return result, err
 	}
 	return result, err
-
 }
