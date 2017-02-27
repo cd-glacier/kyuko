@@ -96,7 +96,7 @@ func ScanReason(rows *sql.Rows) ([]Reason, error) {
 		if err = rows.Scan(&r.ID, &r.CanceledClassID, &r.Reason); err != nil {
 			return reasons, err
 		}
-		reasons = append(reasons, d)
+		reasons = append(reasons, r)
 	}
 	return reasons, err
 }
@@ -123,7 +123,7 @@ func (db *DB) SelectReaonFromCanceledID(canceledID int) ([]Reason, error) {
 		return reasons, err
 	}
 	defer rows.Close()
-	reasons, err := ScannReason(rows)
+	reasons, err = ScanReason(rows)
 	if err != nil {
 		return reasons, err
 	}
