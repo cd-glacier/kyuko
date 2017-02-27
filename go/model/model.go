@@ -88,6 +88,19 @@ func ScanDay(rows *sql.Rows) ([]Day, error) {
 	return days, err
 }
 
+func ScanReason(rows *sql.Rows) ([]Reason, error) {
+	reasons := []Reason{}
+	var err error
+	for rows.Next() {
+		var r Reason
+		if err = rows.Scan(&r.ID, &r.CanceledClassID, &r.Reason); err != nil {
+			return reasons, err
+		}
+		reasons = append(reasons, d)
+	}
+	return reasons, err
+}
+
 func (db *DB) SelectAll() ([]KyukoData, error) {
 	kyukoData := []KyukoData{}
 	rows, err := db.db.Query("select * from kyuko_data where id in(select min(id) from kyuko_data group by class_name, day);")
@@ -100,6 +113,22 @@ func (db *DB) SelectAll() ([]KyukoData, error) {
 		return kyukoData, err
 	}
 	return kyukoData, err
+}
+
+func (db *DB) SelectReaonFromCanceledID(canceledID int) ([]Reason, error) {
+	reasons := []Reason{}
+	sql := "SELECT * FROM reason WHERE canceled_id=?"
+	rows, err := db.db.Query(sql, canceledID)
+	if err != nil {
+		return reasons, err
+	}
+	defer rows.Close()
+	reasons, err := ScannReason(rows)
+	if err != nil {
+		return reasons, err
+	}
+
+	return reasons, nil
 }
 
 // DBからIDを取得します。
