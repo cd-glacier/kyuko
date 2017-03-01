@@ -1,6 +1,7 @@
 package kyuko
 
 import (
+	"errors"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -157,6 +158,10 @@ func manageDB(kyukoData []model.KyukoData, db model.DB) error {
 }
 
 func manageTwitter(kyukoData []model.KyukoData, client *goTwitter.Client) error {
+	if len(kyukoData) <= 0 {
+		return errors.New("tweet content of null")
+	}
+
 	tws, err := twitter.CreateContent(kyukoData)
 	if err != nil {
 		return err
@@ -168,7 +173,6 @@ func manageTwitter(kyukoData []model.KyukoData, client *goTwitter.Client) error 
 			return err
 		}
 	}
-
 	return nil
 }
 
