@@ -4,6 +4,7 @@ ENV:=development
 
 setup:
 	go get github.com/rubenv/sql-migrate/...
+	go get github.com/Sirupsen/logrus
 	go get github.com/tools/godep
 	godep get
 
