@@ -14,14 +14,14 @@ import (
 func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
 	var kyukoData []model.KyukoData
 
-	weekday := weekdayToday()
+	isTommorow := allowTommorowData()
 
-	doc, err := readHTML(place, weekday)
+	doc, err := readHTML(place, isTommorow)
 	if err != nil {
 		return kyukoData, err
 	}
 
-	kyukoData, err = scraper(doc)
+	kyukoData, err = scraper(doc, place)
 	if err != nil {
 		return kyukoData, err
 	}
@@ -40,6 +40,22 @@ func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
 	return kyukoData, nil
 }
 
+func allowTommorowData() bool {
+	//今の時間
+	nowTime := time.Now().Hour()
+	// 18:00超えてたら次の日の情報にする
+	if nowTime >= 18 {
+		return true
+	}
+	//今日の曜日
+	weekday := int(time.Now().Weekday())
+	// 日曜なら月曜の情報にする
+	if weekday == 7 {
+		return true
+	}
+	return false
+}
+
 func weekdayToday() int {
 	//今日の曜日
 	weekday := int(time.Now().Weekday())
@@ -56,10 +72,10 @@ func weekdayToday() int {
 	return weekday
 }
 
-func readHTML(place, weekday int) (*goquery.Document, error) {
+func readHTML(place int, isTommorow bool) (*goquery.Document, error) {
 	//第一引数:校地
 	//第二引数:曜日
-	url, err := scrape.SetUrl(place, weekday)
+	url, err := scrape.SetUrl(place, isTommorow)
 	if err != nil {
 		return nil, err
 	}
@@ -75,8 +91,8 @@ func readHTML(place, weekday int) (*goquery.Document, error) {
 	return doc, err
 }
 
-func scraper(doc *goquery.Document) ([]model.KyukoData, error) {
-	kyukoData, err := scrape.Scrape(doc)
+func scraper(doc *goquery.Document, place int) ([]model.KyukoData, error) {
+	kyukoData, err := scrape.Scrape(doc, place)
 	if err != nil {
 		return nil, err
 	}

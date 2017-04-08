@@ -13,7 +13,7 @@ import (
 	"golang.org/x/text/encoding/japanese"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
-	"fmt"
+	"golang.org/x/net/idna"
 )
 
 var stringCleaner *strings.Replacer
@@ -24,8 +24,15 @@ func init() {
 
 //place(1: 今出川 ,2: 京田辺), week(1 ~ 6: Mon ~ Sat)を引数に持ち
 //urlを生成する
+func SetUrl(place int, isTommorow bool) (string, error){
+	url := "https://duet.doshisha.ac.jp/kokai/html/fi/fi050/FI05001G.html"
+	if isTommorow {
+		url = "https://duet.doshisha.ac.jp/kokai/html/fi/fi050/FI05001G_02.html"
+	}
+}
+/*
 func SetUrl(place, week int) (string, error) {
-	url := "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1"
+	//url := "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1"
 	//weekに7(Sunday)はない
 	if (place != 1 && place != 2) || week < 1 || week > 6 {
 		return "", errors.New("place is 1 or 2, 0 < week < 7")
@@ -35,6 +42,7 @@ func SetUrl(place, week int) (string, error) {
 		return url, nil
 	}
 }
+*/
 
 func Get(url string) (io.Reader, error) {
 	var err error
@@ -64,7 +72,7 @@ func GetKyukoTobaleLine(doc *goquery.Document, place int) [][]string {
 	GetPlaceComponent(doc, 1).Find("tr").Each(func(i int, s *goquery.Selection) {
 		if i != 0 {
 			var elements []string
-			s.Find("td").Each(func(j int, e *goquery.Selection){
+			s.Find("td").Each(func(j int, e *goquery.Selection) {
 				elements = append(elements, e.Text())
 			})
 			lines = append(lines, elements)
@@ -106,6 +114,57 @@ func ScrapeReason(doc *goquery.Document, place int) ([]string, error) {
 	return reasons, nil
 }
 
+func ScrapeName(doc *goquery.Document, place int) ([]string, error) {
+	var names []string
+	lines := GetKyukoTobaleLine(doc, place)
+	for _, line := range lines {
+		name := strings.Replace(line[1], "\n", "", -1)
+		name = strings.Replace(line[1], " ", "", -1)
+		names = append(names, name)
+	}
+	return names, nil
+}
+
+func ScrapeInstructor(doc *goquery.Document, place int) ([]string, error) {
+	var names []string
+	lines := GetKyukoTobaleLine(doc, place)
+	for _, line := range lines {
+		name := strings.Replace(line[2], "\n", "", -1)
+		names = append(names, name)
+	}
+	return names, nil
+}
+
+func ScrapeNameAndInstructor(doc *goquery.Document, place int) (names, instructors []string, err error) {
+	names, err = ScrapeName(doc, place)
+	instructors, err = ScrapeInstructor(doc, place)
+	return names, instructors, err
+}
+
+func ScrapeWeekday(doc *goquery.Document) (int, error) {
+	weekday := doc.Find(".today").Text()
+	weekday = strings.Split(weekday, "(")[1]
+	weekday = strings.Replace(weekday, ")", "", -1)
+	weekday = stringCleaner.Replace(weekday)
+	youbi, err := ConvertWeekStoi(weekday)
+
+	if err != nil {
+		return -1, err
+	}
+	return youbi, nil
+}
+
+func ScrapeDay(doc *goquery.Document) (string, error) {
+	day := doc.Find("#form1 > span").Text()
+	day = strings.Split(day, " ")[0]
+	day = stringCleaner.Replace(day)
+	year := strings.Split(day, "年")[0]
+	month := strings.Split(strings.Split(day, "年")[1], "月")[0]
+	date := strings.Split(strings.Split(day, "日")[0], "月")[1]
+
+	return string(year) + "/" + string(month) + "/" + string(date), nil
+}
+
 /* Duetのversion変化に伴って更新
 func ScrapePeriod(doc *goquery.Document) ([]int, error) {
 	var periods []int
@@ -141,7 +200,6 @@ func ScrapeReason(doc *goquery.Document) ([]string, error) {
 
 	return reasons, err
 }
-*/
 
 func ScrapeNameAndInstructor(doc *goquery.Document) (names, instructors []string, err error) {
 	doc.Find("tr.style1 > td").Each(func(i int, s *goquery.Selection) {
@@ -163,6 +221,19 @@ func ScrapeNameAndInstructor(doc *goquery.Document) (names, instructors []string
 	return names, instructors, nil
 }
 
+func ScrapeWeekday(doc *goquery.Document) (int, error) {
+	weekday := doc.Find("tr.styleT > th").Text()
+	weekday = strings.Split(weekday, "(")[1]
+	weekday = strings.Replace(weekday, ")", "", -1)
+	weekday = stringCleaner.Replace(weekday)
+	youbi, err := ConvertWeekStoi(weekday)
+
+	if err != nil {
+		return -1, err
+	}
+	return youbi, nil
+}
+
 func ScrapeDay(doc *goquery.Document) (string, error) {
 	day := doc.Find("tr.styleT > th").Text()
 	day = strings.Split(day, "]")[1]
@@ -174,6 +245,8 @@ func ScrapeDay(doc *goquery.Document) (string, error) {
 
 	return string(year) + "/" + string(month) + "/" + string(date), nil
 }
+
+*/
 
 func ScrapePlace(doc *goquery.Document) (int, error) {
 	place := doc.Find("tr.styleT > th").Text()
@@ -187,7 +260,6 @@ func ScrapePlace(doc *goquery.Document) (int, error) {
 	}
 
 	return 0, errors.New("place not found")
-
 }
 
 func ConvertWeekStoi(weekday string) (int, error) {
@@ -198,21 +270,6 @@ func ConvertWeekStoi(weekday string) (int, error) {
 	}
 
 	return weekMap[weekday], nil
-}
-
-func ScrapeWeekday(doc *goquery.Document) (int, error) {
-	weekday := doc.Find("tr.styleT > th").Text()
-	weekday = strings.Split(weekday, "(")[1]
-	weekday = strings.Replace(weekday, ")", "", -1)
-	weekday = stringCleaner.Replace(weekday)
-	youbi, err := ConvertWeekStoi(weekday)
-
-	if err != nil {
-		return -1, err
-	}
-
-	return youbi, nil
-
 }
 
 //休講structのsliceを返す
@@ -227,7 +284,7 @@ func Scrape(doc *goquery.Document, place int) ([]model.KyukoData, error) {
 
 	periods, err = ScrapePeriod(doc, place)
 	reasons, err = ScrapeReason(doc, place)
-	names, instructors, err = ScrapeNameAndInstructor(doc)
+	names, instructors, err = ScrapeNameAndInstructor(doc, place)
 	weekday, err = ScrapeWeekday(doc)
 	day, err = ScrapeDay(doc)
 
