@@ -12,6 +12,8 @@ import (
 	"github.com/g-hyoga/kyuko/go/model"
 	"golang.org/x/text/encoding/japanese"
 	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
+	"fmt"
 )
 
 var stringCleaner *strings.Replacer
@@ -52,13 +54,66 @@ func Get(url string) (io.Reader, error) {
 	return utfBody, nil
 }
 
+func GetPlaceComponent(doc *goquery.Document, place int) *goquery.Document {
+	node := doc.Find(".data").Get(place)
+	return goquery.NewDocumentFromNode(node)
+}
+
+func GetKyukoTobaleLine(doc *goquery.Document, place int) [][]string {
+	var lines [][]string
+	GetPlaceComponent(doc, 1).Find("tr").Each(func(i int, s *goquery.Selection) {
+		if i != 0 {
+			var elements []string
+			s.Find("td").Each(func(j int, e *goquery.Selection){
+				elements = append(elements, e.Text())
+			})
+			lines = append(lines, elements)
+		}
+	})
+	return lines
+}
+
+func ScrapePeriod(doc *goquery.Document, place int) ([]int, error) {
+	var periods []int
+	var err error
+
+	lines := GetKyukoTobaleLine(doc, place)
+
+	for _, line := range lines {
+		stringPeriod := strings.Split(line[0], "講時")[0]
+		stringPeriod = strings.Replace(stringPeriod, "\n", "", -1)
+		stringPeriod = string(norm.NFKC.Bytes([]byte(stringPeriod)))
+		period, _ := strconv.Atoi(stringPeriod)
+
+		if period > 7 || period < 1 {
+			err = errors.New("period is not found")
+		}
+		periods = append(periods, period)
+	}
+	return periods, err
+}
+
+func ScrapeReason(doc *goquery.Document, place int) ([]string, error) {
+	var reasons []string
+
+	lines := GetKyukoTobaleLine(doc, place)
+
+	for _, line := range lines {
+		reason := line[3]
+		reasons = append(reasons, reason)
+	}
+
+	return reasons, nil
+}
+
+/* Duetのversion変化に伴って更新
 func ScrapePeriod(doc *goquery.Document) ([]int, error) {
 	var periods []int
 	var err error
 
 	//エラー処理どうにかする
 	//"1講時"みたいなのが取れる
-	doc.Find("tr.style1").Each(func(i int, s *goquery.Selection) {
+	doc.Find("tr.").Each(func(i int, s *goquery.Selection) {
 		originalPeriod := s.Find("th.style2").Text()
 
 		stringPeriod := strings.Split(originalPeriod, "講時")[0]
@@ -86,6 +141,7 @@ func ScrapeReason(doc *goquery.Document) ([]string, error) {
 
 	return reasons, err
 }
+*/
 
 func ScrapeNameAndInstructor(doc *goquery.Document) (names, instructors []string, err error) {
 	doc.Find("tr.style1 > td").Each(func(i int, s *goquery.Selection) {
@@ -160,21 +216,20 @@ func ScrapeWeekday(doc *goquery.Document) (int, error) {
 }
 
 //休講structのsliceを返す
-func Scrape(doc *goquery.Document) ([]model.KyukoData, error) {
+func Scrape(doc *goquery.Document, place int) ([]model.KyukoData, error) {
 	var kyukoData []model.KyukoData
 	var err error
 
 	var periods []int
 	var reasons, names, instructors []string
-	var weekday, place int
+	var weekday int
 	var day string
 
-	periods, err = ScrapePeriod(doc)
-	reasons, err = ScrapeReason(doc)
+	periods, err = ScrapePeriod(doc, place)
+	reasons, err = ScrapeReason(doc, place)
 	names, instructors, err = ScrapeNameAndInstructor(doc)
 	weekday, err = ScrapeWeekday(doc)
 	day, err = ScrapeDay(doc)
-	place, err = ScrapePlace(doc)
 
 	if err != nil {
 		return nil, err
