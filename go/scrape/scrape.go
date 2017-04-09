@@ -10,10 +10,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/g-hyoga/kyuko/go/model"
-	"golang.org/x/text/encoding/japanese"
-	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
-	"golang.org/x/net/idna"
 )
 
 var stringCleaner *strings.Replacer
@@ -24,12 +21,14 @@ func init() {
 
 //place(1: 今出川 ,2: 京田辺), week(1 ~ 6: Mon ~ Sat)を引数に持ち
 //urlを生成する
-func SetUrl(place int, isTommorow bool) (string, error){
+func SetUrl(place int, isTommorow bool) (string, error) {
 	url := "https://duet.doshisha.ac.jp/kokai/html/fi/fi050/FI05001G.html"
 	if isTommorow {
 		url = "https://duet.doshisha.ac.jp/kokai/html/fi/fi050/FI05001G_02.html"
 	}
+	return url, nil
 }
+
 /*
 func SetUrl(place, week int) (string, error) {
 	//url := "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1"
@@ -57,9 +56,9 @@ func Get(url string) (io.Reader, error) {
 	body.ReadFrom(resp.Body)
 
 	reader := bytes.NewReader(body.Bytes())
-	utfBody := transform.NewReader(reader, japanese.ShiftJIS.NewDecoder())
+	//utfBody := transform.NewReader(reader, japanese.ShiftJIS.NewDecoder())
 
-	return utfBody, nil
+	return reader, nil
 }
 
 func GetPlaceComponent(doc *goquery.Document, place int) *goquery.Document {

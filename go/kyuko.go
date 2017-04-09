@@ -9,6 +9,7 @@ import (
 	"github.com/g-hyoga/kyuko/go/model"
 	"github.com/g-hyoga/kyuko/go/scrape"
 	"github.com/g-hyoga/kyuko/go/twitter"
+	"fmt"
 )
 
 func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
@@ -183,12 +184,15 @@ func manageTwitter(kyukoData []model.KyukoData, client *goTwitter.Client) error 
 		return err
 	}
 
+	fmt.Println(tws)
+	/*
 	for _, tw := range tws {
 		err := twitter.Update(client, tw)
 		if err != nil {
 			return err
 		}
 	}
+	*/
 	return nil
 }
 
