@@ -1,7 +1,6 @@
 package scrape
 
 import (
-	"io"
 	"io/ioutil"
 	"reflect"
 	"strings"
@@ -9,8 +8,6 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/g-hyoga/kyuko/go/model"
-	"golang.org/x/text/encoding/japanese"
-	"golang.org/x/text/transform"
 )
 
 var kyukoDoc, noKyukoDoc *goquery.Document
@@ -24,22 +21,23 @@ var noTestDay string
 var noTestData []model.KyukoData
 
 const (
-	KYUKOFILE   = "../testdata/kyuko.html"
-	NOKYUKOFILE = "../testdata/not_kyuko.html"
+	KYUKOFILE   = "../testdata/new_kyuko.html"
+	NOKYUKOFILE = "../testdata/new_not_kyuko.html"
 )
 
 func init() {
 	//休講ある
-	kyukoReader, _ := EncodeTestFile(KYUKOFILE)
+	kyukoFile, _ := ioutil.ReadFile(KYUKOFILE)
+	kyukoReader := strings.NewReader(string(kyukoFile))
 	kyukoDoc, _ = goquery.NewDocumentFromReader(kyukoReader)
 
-	testPeriods = []int{2, 2, 2, 5}
-	testReasons = []string{"公務", "出張", "公務", ""}
-	testNames = []string{"環境生理学", "電気・電子計測Ｉ－１", "応用数学ＩＩ－１", "イングリッシュ・セミナー２－７０２"}
-	testInstructors = []string{"福岡義之", "松川真美", "大川領", "稲垣俊史"}
+	testPeriods = []int{4, 5}
+	testReasons = []string{"公務", "公務"}
+	testNames = []string{"情報処理演習", "精神病理学"}
+	testInstructors = []string{"田中宏季", "佃宗紀"}
 	testPlace = 2
-	testDay = "2016/10/10"
-	testWeekday = 1
+	testDay = "2017/04/14"
+	testWeekday = 5
 
 	for i := range testPeriods {
 		k := model.KyukoData{}
@@ -54,51 +52,21 @@ func init() {
 	}
 
 	//休講ない
-	noKyukoReader, _ := EncodeTestFile(NOKYUKOFILE)
+	noKyukoFile, _ := ioutil.ReadFile(NOKYUKOFILE)
+	noKyukoReader := strings.NewReader(string(noKyukoFile))
 	noKyukoDoc, _ = goquery.NewDocumentFromReader(noKyukoReader)
 
 	noTestPlace = 1
 	noTestWeekday = 6
 }
 
-func SjisToUtf8(str string) (string, error) {
-	ret, err := ioutil.ReadAll(transform.NewReader(strings.NewReader(str), japanese.ShiftJIS.NewDecoder()))
-	if err != nil {
-		return "", err
-	}
-	return string(ret), err
-}
-
-func EncodeTestFile(fileName string) (io.Reader, error) {
-	//testfileのenocde
-	file, err := ioutil.ReadFile(fileName)
-	if err != nil {
-		return nil, err
-	}
-	utfFile, err := SjisToUtf8(string(file))
-	if err != nil {
-		return nil, err
-	}
-	stringReader := strings.NewReader(utfFile)
-
-	return stringReader, nil
-}
-
 func TestSetUrl(t *testing.T) {
-	if url, err := SetUrl(1, 1); url != "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=1&kouchi=1" {
-		t.Fatalf("urlの生成がうまくできていないようです\n err: %s", err)
+	if url, err := SetUrl(1, true); url != "https://duet.doshisha.ac.jp/kokai/html/fi/fi050/FI05001G_02.html" {
+		t.Fatalf("明日のurlになっていません\n err: %s", err)
 	}
 
-	if url, err := SetUrl(2, 5); url != "http://duet.doshisha.ac.jp/info/KK1000.jsp?katei=1&youbi=5&kouchi=2" || err != nil {
-		t.Fatalf("urlの生成がうまくできていないようです\n err: %s", err)
-	}
-
-	if url, err := SetUrl(3, 1); err == nil {
-		t.Fatalf("存在しない校地のurlが生成されています\n created url: %s", url)
-	}
-
-	if url, err := SetUrl(1, 7); err == nil {
-		t.Fatalf("日曜日のurlは必要ありません\n created url: %s", url)
+	if url, err := SetUrl(1, false); url != "https://duet.doshisha.ac.jp/kokai/html/fi/fi050/FI05001G.html" || err != nil {
+		t.Fatalf("今日のurlになっていません\n err: %s", err)
 	}
 }
 
@@ -108,7 +76,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestScrapePeriod(t *testing.T) {
-	periods, err := ScrapePeriod(kyukoDoc)
+	periods, err := ScrapePeriod(kyukoDoc, 2)
 	if err != nil {
 		t.Fatalf("periodをスクレイピングできませんでした\n%s", err)
 	}
@@ -117,7 +85,7 @@ func TestScrapePeriod(t *testing.T) {
 		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %d\n got:  %d", testPeriods, periods)
 	}
 
-	periods, err = ScrapePeriod(noKyukoDoc)
+	periods, err = ScrapePeriod(noKyukoDoc, 2)
 	if err != nil {
 		t.Fatalf("periodをスクレイピングできませんでした\n%s", err)
 	}
@@ -127,8 +95,7 @@ func TestScrapePeriod(t *testing.T) {
 }
 
 func TestScrapeReason(t *testing.T) {
-
-	reasons, err := ScrapeReason(kyukoDoc)
+	reasons, err := ScrapeReason(kyukoDoc, 2)
 	if err != nil {
 		t.Fatalf("reasonをスクレイピングできませんでした\n%s", err)
 	}
@@ -137,7 +104,7 @@ func TestScrapeReason(t *testing.T) {
 		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testReasons, reasons)
 	}
 
-	reasons, err = ScrapeReason(noKyukoDoc)
+	reasons, err = ScrapeReason(noKyukoDoc, 2)
 	if err != nil {
 		t.Fatalf("periodをスクレイピングできませんでした\n%s", err)
 	}
@@ -156,28 +123,6 @@ func TestScrapeDay(t *testing.T) {
 	if day != testDay {
 		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", testDay, day)
 	}
-
-}
-
-func TestScrapePlace(t *testing.T) {
-	place, err := ScrapePlace(kyukoDoc)
-	if err != nil {
-		t.Fatalf("placeを取得できませんでした\n%s", err)
-	}
-
-	if place != testPlace {
-		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", testPlace, place)
-	}
-
-	place, err = ScrapePlace(noKyukoDoc)
-	if err != nil {
-		t.Fatalf("placeを取得できませんでした\n%s", err)
-	}
-
-	if place != noTestPlace {
-		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", noTestPlace, place)
-	}
-
 }
 
 func TestScrapeWeeday(t *testing.T) {
@@ -190,19 +135,21 @@ func TestScrapeWeeday(t *testing.T) {
 		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", testWeekday, weekday)
 	}
 
-	weekday, err = ScrapeWeekday(noKyukoDoc)
-	if err != nil {
-		t.Fatalf("曜日をスクレイピングできませんでした\n%s", err)
-	}
+	/*
+		weekday, err = ScrapeWeekday(noKyukoDoc)
+		if err != nil {
+			t.Fatalf("曜日をスクレイピングできませんでした\n%s", err)
+		}
 
-	if weekday != noTestWeekday {
-		t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", noTestWeekday, weekday)
-	}
+		if weekday != noTestWeekday {
+			t.Fatalf("取得した結果が求めるものと違ったようです\nwant: %v\ngot:  %v", noTestWeekday, weekday)
+		}
+	*/
 
 }
 
 func TestScrapeNameAndInstructor(t *testing.T) {
-	names, instructors, err := ScrapeNameAndInstructor(kyukoDoc)
+	names, instructors, err := ScrapeNameAndInstructor(kyukoDoc, 2)
 	if err != nil {
 		t.Fatalf("Nameのスクレイピングに失敗したようです\n%s", err)
 	}
@@ -215,7 +162,7 @@ func TestScrapeNameAndInstructor(t *testing.T) {
 		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", testInstructors, instructors)
 	}
 
-	names, instructors, err = ScrapeNameAndInstructor(noKyukoDoc)
+	names, instructors, err = ScrapeNameAndInstructor(noKyukoDoc, 1)
 	if err != nil {
 		t.Fatalf("periodをスクレイピングできませんでした\n%s", err)
 	}
@@ -229,7 +176,7 @@ func TestScrapeNameAndInstructor(t *testing.T) {
 }
 
 func TestScrape(t *testing.T) {
-	allData, err := Scrape(kyukoDoc)
+	allData, err := Scrape(kyukoDoc, 2)
 	if err != nil {
 		t.Fatalf("scrapingに失敗しました\n%s", err)
 	}
@@ -240,7 +187,7 @@ func TestScrape(t *testing.T) {
 }
 
 func TestScrapeWithNoClass(t *testing.T) {
-	result, err := Scrape(noKyukoDoc)
+	result, err := Scrape(noKyukoDoc, 1)
 	if err != nil {
 		t.Fatalf("scrapingに失敗しました\n%s", err)
 	}
@@ -252,13 +199,13 @@ func TestScrapeWithNoClass(t *testing.T) {
 
 func BenchmarkScrape(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Scrape(kyukoDoc)
+		Scrape(kyukoDoc, 1)
 	}
 }
 
 func BenchmarkSetUrl(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		SetUrl(1, 1)
+		SetUrl(1, true)
 	}
 }
 
@@ -270,25 +217,25 @@ func BenchmarkScrapeDay(b *testing.B) {
 
 func BenchmarkScrapeNameAndInstructor(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ScrapeNameAndInstructor(kyukoDoc)
+		ScrapeNameAndInstructor(kyukoDoc, 1)
 	}
 }
 
 func BenchmarkScrapePeriod(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ScrapePeriod(kyukoDoc)
+		ScrapePeriod(kyukoDoc, 1)
 	}
 }
 
 func BenchmarkScrapePlace(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ScrapePeriod(kyukoDoc)
+		ScrapePeriod(kyukoDoc, 1)
 	}
 }
 
 func BenchmarkScrapeReason(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ScrapeReason(kyukoDoc)
+		ScrapeReason(kyukoDoc, 1)
 	}
 }
 
