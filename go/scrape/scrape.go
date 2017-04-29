@@ -114,6 +114,7 @@ func ScrapeInstructor(doc *goquery.Document, place int) ([]string, error) {
 	lines := GetKyukoTobaleLine(doc, place)
 	for _, line := range lines {
 		name := strings.Replace(line[2], "\n", "", -1)
+		name = strings.Replace(line[2], "　", "", -1)
 		names = append(names, name)
 	}
 	return names, nil

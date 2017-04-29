@@ -176,7 +176,7 @@ func TestScrapeNameAndInstructor(t *testing.T) {
 }
 
 func TestScrape(t *testing.T) {
-	allData, err := Scrape(kyukoDoc, 1)
+	allData, err := Scrape(kyukoDoc, 2)
 	if err != nil {
 		t.Fatalf("scrapingに失敗しました\n%s", err)
 	}
