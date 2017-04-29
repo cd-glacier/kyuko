@@ -3,6 +3,7 @@ package twitter
 import (
 	"errors"
 	"strconv"
+	"strings"
 	"unicode/utf8"
 
 	"github.com/dghubble/go-twitter/twitter"
@@ -97,4 +98,16 @@ func Update(client *twitter.Client, text string) error {
 		return err
 	}
 	return nil
+}
+
+func GetDM(client *twitter.Client) ([]twitter.DirectMessage, error) {
+	para := &twitter.DirectMessageGetParams{Count: 3}
+	dms, _, err := client.DirectMessages.Get(para)
+	return dms, err
+}
+
+func SplitDM(text string) []string {
+	text = strings.Replace(text, " ", "", -1)
+	classnames := strings.Split(text, ",")
+	return classnames
 }

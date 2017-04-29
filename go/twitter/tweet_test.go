@@ -1,10 +1,12 @@
 package twitter
 
 import (
-	"os"
-	"testing"
-
+	"fmt"
 	"github.com/g-hyoga/kyuko/go/model"
+	//"github.com/dghubble/go-twitter/twitter"
+	"os"
+	"reflect"
+	"testing"
 )
 
 var testPeriods []int
@@ -110,6 +112,26 @@ func TestCreateContent(t *testing.T) {
 		}
 	}
 
+}
+
+func TestGetDM(t *testing.T) {
+	tClient := NewTwitterClient(T_CONSUMER_KEY, T_CONSUMER_SECRET, T_ACCESS_TOKEN, T_ACCESS_TOKEN_SECRET)
+	_, err := GetDM(tClient)
+	if err != nil {
+		t.Fatalf("GetDmでエラー\nerr: %s", err)
+	}
+	//fmt.Println(dms)
+}
+
+func TestSplitDM(t *testing.T) {
+	dm := "java  , c ,python   , gol ang "
+	ans := []string{"java", "c", "python", "golang"}
+	classnames := SplitDM(dm)
+	fmt.Println(dm)
+	fmt.Println(classnames)
+	if !reflect.DeepEqual(ans, classnames) {
+		t.Fatalf("取得した結果が求めるものと違ったようです\n want: %v\n got:  %v", ans, classnames)
+	}
 }
 
 func BenchmarkCreateLine(b *testing.B) {
