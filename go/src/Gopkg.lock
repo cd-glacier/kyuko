@@ -44,13 +44,13 @@
   version = "v1.1.0"
 
 [[projects]]
-  branch = "master"
+  branch = "DM"
   name = "github.com/g-hyoga/kyuko"
   packages = [
     "go/model",
     "go/twitter"
   ]
-  revision = "14ec02216b72697239343f696f6e86a8c84cd54f"
+  revision = "069b5e5b92fb89f5a85e4b0a81115053f6fe63a8"
 
 [[projects]]
   name = "github.com/go-sql-driver/mysql"
@@ -109,6 +109,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "5fffee847887bbb3dc5480ed6f426f863be37005c43ae017f8c858c3d8f1992b"
+  inputs-digest = "dc888623ab0466e6f323e07b85a7785907d7939bce2fad0cc516c1acd8d79e11"
   solver-name = "gps-cdcl"
   solver-version = 1
