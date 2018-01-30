@@ -1,0 +1,18 @@
+
+kyuko:
+  image: kyuko-image
+  links:
+    - "kyuko-db:mysql"
+  environment:
+    T_CONSUMER_KEY: 
+    T_CONSUMER_SECRET:
+    T_ACCESS_TOKEN:
+    T_ACCESS_TOKEN_SECRET:
+
+kyuko-db:
+  image: mysql
+  volumes_from:
+    - kyuko-data
+  environment:
+    MYSQL_ROOT_PASSWORD: password
+    
