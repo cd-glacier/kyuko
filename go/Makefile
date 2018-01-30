@@ -5,17 +5,17 @@ ENV:=development
 setup:
 	go get github.com/rubenv/sql-migrate/...
 	go get github.com/Sirupsen/logrus
-	go get github.com/tools/godep
-	godep get
+	go get -u github.com/golang/dep/cmd/dep
+	dep get
 
 build:
-	godep go build -o cmd/main cmd/main.go
+	go build -o cmd/main cmd/main.go
 
 run:
-	./cmd/main
+	./src/cmd/main
 
 test:
-	godep go test -v ./... | grep --color=auto -A 3 -e FAIL || echo "PASS ALL TEST"
+	go test -v ./src/... | grep --color=auto -A 3 -e FAIL || echo "PASS ALL TEST"
 
 migrate/init:
 	#sudo service mysql restart
@@ -30,3 +30,7 @@ migrate/down:
 
 migrate/status:
 	sql-migrate status
+
+docker:
+	docker build -t kyuko .
+

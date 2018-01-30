@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+
+STDERR.sync = STDOUT.sync = true
+
+require 'clockwork'
+
+usage = 'clockwork <clock.rb>'
+file = ARGV.shift or abort usage
+
+file = "./#{file}" unless file.match(/^[\/.]/)
+
+require file
+
+trap('INT') do
+  puts "\rExiting"
+  exit
+end
+
+Clockwork::run
