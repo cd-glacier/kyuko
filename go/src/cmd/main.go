@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/Sirupsen/logrus"
-	kyuko "github.com/g-hyoga/kyuko/go/src"
+	"github.com/g-hyoga/kyuko/go/src/kyuko"
 	"github.com/g-hyoga/kyuko/go/twitter"
 )
 

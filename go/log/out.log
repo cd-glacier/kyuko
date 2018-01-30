@@ -6,3 +6,5 @@
 {"data":null,"level":"info","msg":"kyuko data","time":"2017-04-29T17:21:47+09:00"}
 {"data":null,"level":"info","msg":"kyuko data","time":"2017-04-29T17:21:48+09:00"}
 {"err":"dial tcp 127.0.0.1:3306: getsockopt: connection refused","level":"fatal","msg":"error","time":"2018-01-18T20:13:37+09:00"}
+{"data":null,"level":"info","msg":"kyuko data","time":"2018-01-30T19:59:49+09:00"}
+{"data":null,"level":"info","msg":"kyuko data","time":"2018-01-30T19:59:49+09:00"}
