@@ -12,10 +12,10 @@ build:
 	go build -o cmd/main cmd/main.go
 
 run:
-	./cmd/main
+	./src/cmd/main
 
 test:
-	go test -v ./... | grep --color=auto -A 3 -e FAIL || echo "PASS ALL TEST"
+	go test -v ./src/... | grep --color=auto -A 3 -e FAIL || echo "PASS ALL TEST"
 
 migrate/init:
 	#sudo service mysql restart
