@@ -10,7 +10,7 @@ import (
 	goTwitter "github.com/dghubble/go-twitter/twitter"
 	"github.com/g-hyoga/kyuko/go/src/model"
 	"github.com/g-hyoga/kyuko/go/src/scrape"
-	"github.com/g-hyoga/kyuko/go/src/twitter"
+	"github.com/g-hyoga/kyuko/go/twitter"
 )
 
 func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
