@@ -188,6 +188,7 @@ func manageTwitter(kyukoData []model.KyukoData, client *goTwitter.Client) error 
 	}
 
 	fmt.Println(tws)
+	fmt.Println("running")
 	/*
 		for _, tw := range tws {
 			err := twitter.Update(client, tw)
