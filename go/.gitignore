@@ -1,8 +1,0 @@
-*.swp
-cmd/main
-Godeps/Readme
-Godeps/_workspace
-vendor/
-log/
-.DS_Store
-.idea

@@ -1,5 +1,7 @@
 # 同志社休講情報
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/g-hyoga/kyuko)](https://goreportcard.com/report/github.com/g-hyoga/kyuko)
+
 [今出川twitter](https://twitter.com/kyuko_imadegawa)
 [田辺twitter](https://twitter.com/kyuko_tanabe)
 
@@ -10,8 +12,4 @@ Ruby -> Golang
 から休講情報をスクレイピングしてきて
 twitterになげています
 
-# 休講ランク
 
-[kyukoRank](https://github.com/g-hyoga/kyukoRank)
-
-こっちで作ります
