@@ -17,8 +17,8 @@ services:
   kyuko-app:
     image: golang:1.8-onbuild
     volumes:
-      - "./src/vendor:/go/src/github.com"
-      - "./src:/go/src/app"
+      - ".:/go/src/github.com/g-hyoga/kyuko"
+    working_dir: /go/src/github.com/g-hyoga/kyuko/src
     depends_on:
       - kyuko-db
     command: go run cmd/main.go
