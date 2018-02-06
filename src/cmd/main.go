@@ -23,7 +23,7 @@ var (
 func main() {
 	log := logrus.New()
 	log.Formatter = new(logrus.JSONFormatter)
-	f, err := os.OpenFile("./log/out.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile("../log/out.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	//f, err := os.OpenFile("/root/dev/src/github.com/g-hyoga/kyuko/go/log/out.json", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.WithFields(logrus.Fields{
