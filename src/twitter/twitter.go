@@ -7,7 +7,7 @@ import (
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
-	"github.com/g-hyoga/kyuko/go/src/model"
+	"github.com/g-hyoga/kyuko/src/model"
 )
 
 // newTwitterClient returns a new Twitter Client

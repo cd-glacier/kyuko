@@ -4,8 +4,8 @@ import (
 	"os"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/g-hyoga/kyuko/go/kyuko"
-	"github.com/g-hyoga/kyuko/go/twitter"
+	"github.com/g-hyoga/kyuko/src/kyuko"
+	"github.com/g-hyoga/kyuko/src/twitter"
 )
 
 var (

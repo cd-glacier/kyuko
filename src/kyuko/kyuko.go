@@ -8,9 +8,9 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	goTwitter "github.com/dghubble/go-twitter/twitter"
-	"github.com/g-hyoga/kyuko/go/src/model"
-	"github.com/g-hyoga/kyuko/go/src/scrape"
-	"github.com/g-hyoga/kyuko/go/twitter"
+	"github.com/g-hyoga/kyuko/src/model"
+	"github.com/g-hyoga/kyuko/src/scrape"
+	"github.com/g-hyoga/kyuko/src/twitter"
 )
 
 func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
