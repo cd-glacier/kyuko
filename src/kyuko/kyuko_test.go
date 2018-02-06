@@ -12,7 +12,7 @@ import (
 	"golang.org/x/text/transform"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/g-hyoga/kyuko/go/model"
+	"github.com/g-hyoga/kyuko/src/model"
 )
 
 var (

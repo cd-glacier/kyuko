@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/g-hyoga/kyuko/go/model"
+	"github.com/g-hyoga/kyuko/src/model"
 )
 
 var testPeriods []int

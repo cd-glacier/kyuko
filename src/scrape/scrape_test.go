@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/g-hyoga/kyuko/go/model"
+	"github.com/g-hyoga/kyuko/src/model"
 )
 
 var kyukoDoc, noKyukoDoc *goquery.Document

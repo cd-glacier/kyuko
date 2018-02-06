@@ -11,7 +11,7 @@ import (
 	"golang.org/x/text/unicode/norm"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/g-hyoga/kyuko/go/src/model"
+	"github.com/g-hyoga/kyuko/src/model"
 )
 
 var stringCleaner *strings.Replacer
