@@ -1,8 +1,5 @@
-FROM golang:1.8
+FROM golang:1.8 
 
-WORKDIR /go/src/github.com/g-hyoga/kyuko
-COPY . .
+COPY ./bin /usr/local/bin
 
-WORKDIR /go/src/github.com/g-hyoga/kyuko/src
-
-CMD ["go", "run", "cmd/main.go"]
+CMD ["/usr/local/bin/main"]
