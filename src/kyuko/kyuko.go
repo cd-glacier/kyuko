@@ -28,11 +28,13 @@ func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
 		return kyukoData, err
 	}
 
-	var db model.DB
-	err = manageDB(kyukoData, db)
-	if err != nil {
-		return kyukoData, err
-	}
+	/*
+		var db model.DB
+		err = manageDB(kyukoData, db)
+		if err != nil {
+			return kyukoData, err
+		}
+	*/
 
 	/*
 		err = manageTwitter(kyukoData, client)
