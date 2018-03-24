@@ -1,8 +1,8 @@
 Type: "AWS::Lambda::Function"
 Properties: 
   Code:
-    Code
-  Description: "kyuko-lambda"
+    Zipfile: "./output/handler.zip"
+  Description: "kyuko on lambda"
   FunctionName: "kyuko"
   Handler: "kyuko-handler"
   Role: "arn:aws:iam::878798127453:role/lambda_to_s3"
