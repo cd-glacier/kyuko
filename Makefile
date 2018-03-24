@@ -1,16 +1,20 @@
-binary-name=kyuko-lambda
+binary-name=kyukoHandler
 lambda-name=kyuko
 
-build:
+build: clean
 	docker build -t kyuko-image .
 	docker run -v $(PWD)/bin:/go/src/github.com/g-hyoga/kyuko/bin kyuko-image 
-	mkdir output
-	zip ./output/handler.zip ./bin/$(binary-name)
+	if [ ! -d output ]; then \
+		mkdir output; \
+	fi
+	cd bin && zip ../output/handler.zip $(binary-name)
 
-local-buid:
+local-buid: clean
 	go build -o ./bin/$(binary-name) src/cmd/main.go 
-	mkdir output
-	zip ./output/handler.zip ./bin/$(binary-name)
+	if [ ! -d output ]; then \
+		mkdir output; \
+	fi
+	cd bin && zip ../output/handler.zip $(binary-name)
 
 clean:
 	rm -rf bin

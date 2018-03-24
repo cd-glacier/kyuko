@@ -9,4 +9,4 @@ RUN dep init
 ENV GOOS linux
 ENV GOARCH amd64
 
-CMD ["go", "build", "-o", "./bin/kyuko-lambda", "src/cmd/main.go"]
+CMD ["go", "build", "-o", "./bin/kyukoHandler", "src/cmd/main.go"]
