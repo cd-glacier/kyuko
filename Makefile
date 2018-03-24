@@ -7,7 +7,6 @@ test:
 
 build:
 	docker build -t kyuko-bin -f Dockerfile.bin .
-	docker run -v $(PWD)/bin:/go/src/github.com/g-hyoga/kyuko/bin kyuko-app
 
 deploy: build
 	docker build -t kyuko-app .
