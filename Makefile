@@ -9,8 +9,8 @@ build: clean
 	fi
 	cd bin && zip ../output/handler.zip $(binary-name)
 
-local-buid: clean
-	go build -o ./bin/$(binary-name) src/cmd/main.go 
+local-build: clean
+	GOOS=linux GOARCH=amd64 go build -o ./bin/$(binary-name) src/cmd/main.go 
 	if [ ! -d output ]; then \
 		mkdir output; \
 	fi

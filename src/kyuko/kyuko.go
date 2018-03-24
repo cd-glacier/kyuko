@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	goTwitter "github.com/dghubble/go-twitter/twitter"
-	"github.com/g-hyoga/kyuko/src/model"
+	"github.com/g-hyoga/kyuko/scrape"
+	"github.com/g-hyoga/kyuko/src/data"
 )
 
-func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
-	var kyukoData []model.KyukoData
+func Exec(place int, client *goTwitter.Client) ([]data.KyukoData, error) {
+	var kyukoData []data.KyukoData
 
 	isTommorow := allowTommorowData()
 
@@ -30,7 +32,7 @@ func allowTommorowData() bool {
 	//今の時間
 	nowTime := time.Now().Hour()
 
-	fmt.Println(nowTime)
+	fmt.Printf("Time: %s", string(nowTime))
 
 	// 18:00超えてたら次の日の情報にする
 	if nowTime >= 18 {
@@ -43,4 +45,31 @@ func allowTommorowData() bool {
 		return true
 	}
 	return false
+}
+
+func readHTML(place int, isTommorow bool) (*goquery.Document, error) {
+	//第一引数:校地
+	//第二引数:曜日
+	url, err := scrape.SetUrl(place, isTommorow)
+	if err != nil {
+		return nil, err
+	}
+	//http
+	reader, err := scrape.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	doc, err := goquery.NewDocumentFromReader(reader)
+	if err != nil {
+		return nil, err
+	}
+	return doc, err
+}
+
+func scraper(doc *goquery.Document, place int) ([]data.KyukoData, error) {
+	kyukoData, err := scrape.Scrape(doc, place)
+	if err != nil {
+		return nil, err
+	}
+	return kyukoData, nil
 }
