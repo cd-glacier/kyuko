@@ -1,4 +1,5 @@
 binary-name=kyuko-lambda
+lambda-name=kyuko
 
 build:
 	docker build -t kyuko-image .
@@ -16,5 +17,4 @@ clean:
 	rm -rf output
 
 deploy:
-
 
