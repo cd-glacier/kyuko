@@ -1,9 +1,20 @@
-setup:
-	mkdir log
+binary-name=kyuko-lambda
 
-run:
-	docker-compose up
+build:
+	docker build -t kyuko-image .
+	docker run -v $(PWD)/bin:/go/src/github.com/g-hyoga/kyuko/bin kyuko-image 
+	mkdir output
+	zip ./output/handler.zip ./bin/$(binary-name)
 
-test:
-	docker-compose run kyuko-app go test -v ./...
+local-buid:
+	go build -o ./bin/$(binary-name) src/cmd/main.go 
+	mkdir output
+	zip ./output/handler.zip ./bin/$(binary-name)
+
+clean:
+	rm -rf bin
+	rm -rf output
+
+deploy:
+
 
