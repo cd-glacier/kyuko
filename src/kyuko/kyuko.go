@@ -1,6 +1,7 @@
 package kyuko
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -8,6 +9,7 @@ import (
 	goTwitter "github.com/dghubble/go-twitter/twitter"
 	"github.com/g-hyoga/kyuko/src/data"
 	"github.com/g-hyoga/kyuko/src/scrape"
+	"github.com/g-hyoga/kyuko/src/twitter"
 )
 
 func Exec(place int, client *goTwitter.Client) ([]data.KyukoData, error) {
@@ -21,6 +23,11 @@ func Exec(place int, client *goTwitter.Client) ([]data.KyukoData, error) {
 	}
 
 	kyukoData, err = scraper(doc, place)
+	if err != nil || len(kyukoData) <= 0 {
+		return kyukoData, err
+	}
+
+	err = tweet(kyukoData, client)
 	if err != nil {
 		return kyukoData, err
 	}
@@ -32,7 +39,8 @@ func allowTommorowData() bool {
 	//今の時間
 	nowTime := time.Now().Hour()
 
-	fmt.Printf("Time: %s", string(nowTime))
+	fmt.Println("Time Hour")
+	fmt.Println(nowTime)
 
 	// 18:00超えてたら次の日の情報にする
 	if nowTime >= 18 {
@@ -72,4 +80,27 @@ func scraper(doc *goquery.Document, place int) ([]data.KyukoData, error) {
 		return nil, err
 	}
 	return kyukoData, nil
+}
+
+func tweet(kyukoData []data.KyukoData, client *goTwitter.Client) error {
+	if len(kyukoData) <= 0 {
+		return errors.New("tweet content of null")
+	}
+
+	tws, err := twitter.CreateContent(kyukoData)
+	if err != nil {
+		return err
+	}
+
+	for _, tw := range tws {
+		fmt.Println("Tweet")
+		fmt.Println(tw)
+		/*
+			err := twitter.Update(client, tw)
+			if err != nil {
+				return err
+			}
+		*/
+	}
+	return nil
 }
