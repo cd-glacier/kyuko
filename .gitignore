@@ -1,4 +1,4 @@
 .DS_Store
-./bin/kyukoHandler
-./output/handler.zip
+./bin
+./output
 
