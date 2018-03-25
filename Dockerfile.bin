@@ -1,0 +1,9 @@
+FROM golang:1.8
+
+WORKDIR /go/src/github.com/g-hyoga/kyuko
+COPY . .
+
+ENV GOOS linux
+ENV GOARCH amd64
+
+CMD ["go", "build", "-o", "bin/main", "src/cmd/main.go"]

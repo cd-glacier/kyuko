@@ -28,11 +28,13 @@ func Exec(place int, client *goTwitter.Client) ([]model.KyukoData, error) {
 		return kyukoData, err
 	}
 
-	var db model.DB
-	err = manageDB(kyukoData, db)
-	if err != nil {
-		return kyukoData, err
-	}
+	/*
+		var db model.DB
+		err = manageDB(kyukoData, db)
+		if err != nil {
+			return kyukoData, err
+		}
+	*/
 
 	/*
 		err = manageTwitter(kyukoData, client)
@@ -188,7 +190,7 @@ func manageTwitter(kyukoData []model.KyukoData, client *goTwitter.Client) error 
 	}
 
 	fmt.Println(tws)
-	fmt.Println("running")
+	fmt.Println("tweet now")
 	/*
 		for _, tw := range tws {
 			err := twitter.Update(client, tw)
