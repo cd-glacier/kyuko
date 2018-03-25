@@ -12,7 +12,42 @@ Ruby -> Golang -> Golang on AWS Lambda
 から休講情報をスクレイピングしてきて
 twitterになげています
 
+# Develope
 
 
+## Build 
+
+If you can use Docker
+
+```sh
+make build
+```
 
 
+or, If you can use Golang 
+
+```sh
+make local-build
+```
+
+output/handler.zip will be created
+
+## Test
+
+testing using docker(not working...)
+
+```sh
+make testt
+```
+
+or 
+
+testing using local Golang
+
+```sh
+make local-test
+```
+
+# Deploy
+
+not working...
