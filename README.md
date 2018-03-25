@@ -37,7 +37,7 @@ output/handler.zip will be created
 testing using docker(not working...)
 
 ```sh
-make testt
+make test
 ```
 
 or 
