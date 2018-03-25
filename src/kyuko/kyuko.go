@@ -8,12 +8,14 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	goTwitter "github.com/dghubble/go-twitter/twitter"
 	"github.com/g-hyoga/kyuko/src/data"
+	"github.com/g-hyoga/kyuko/src/s3"
 	"github.com/g-hyoga/kyuko/src/scrape"
 	"github.com/g-hyoga/kyuko/src/twitter"
 )
 
-func Exec(place int, client *goTwitter.Client) ([]data.KyukoData, error) {
+func Exec(place int, client *goTwitter.Client, s3 s3.S3) ([]data.KyukoData, error) {
 	var kyukoData []data.KyukoData
+	var err error
 
 	isTommorow := allowTommorowData()
 
@@ -24,6 +26,12 @@ func Exec(place int, client *goTwitter.Client) ([]data.KyukoData, error) {
 
 	kyukoData, err = scraper(doc, place)
 	if err != nil || len(kyukoData) <= 0 {
+		fmt.Println("KyukoData is 0 or scrape err")
+		return kyukoData, err
+	}
+
+	_, err = s3.Put(time.Now().String()+".json", kyukoData)
+	if err != nil {
 		return kyukoData, err
 	}
 
@@ -38,9 +46,6 @@ func Exec(place int, client *goTwitter.Client) ([]data.KyukoData, error) {
 func allowTommorowData() bool {
 	//今の時間
 	nowTime := time.Now().Hour()
-
-	fmt.Println("Time Hour")
-	fmt.Println(nowTime)
 
 	// 18:00超えてたら次の日の情報にする
 	if nowTime >= 18 {
