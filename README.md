@@ -6,7 +6,7 @@
 [田辺twitter](https://twitter.com/kyuko_tanabe)
 
 
-Ruby -> Golang -> Golang on AWS Lambda
+[Ruby](https://github.com/g-hyoga/kyuko/tree/ruby) -> [Golang](https://github.com/g-hyoga/kyuko/tree/Golang) -> [Golang on AWS Lambda](https://github.com/g-hyoga/kyuko)
 
 [ここ](http://duet.doshisha.ac.jp/kyuko/i/)
 から休講情報をスクレイピングしてきて
