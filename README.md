@@ -6,7 +6,7 @@
 [田辺twitter](https://twitter.com/kyuko_tanabe)
 
 
-[Ruby](https://github.com/g-hyoga/kyuko/tree/ruby) -> [Golang](https://github.com/g-hyoga/kyuko/tree/Golang) -> [Golang on AWS Lambda](https://github.com/g-hyoga/kyuko)
+[Ruby](https://github.com/g-hyoga/kyuko/tree/ruby) -> [Golang](https://github.com/g-hyoga/kyuko/tree/Golang) -> [Golang on AWS](https://github.com/g-hyoga/kyuko)
 
 [ここ](http://duet.doshisha.ac.jp/kyuko/i/)
 から休講情報をスクレイピングしてきて
@@ -51,3 +51,8 @@ make local-test
 # Deploy
 
 not working...
+
+# Structure
+
+cron -> Lambda -> s3
+
