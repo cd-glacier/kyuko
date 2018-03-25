@@ -6,8 +6,8 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	goTwitter "github.com/dghubble/go-twitter/twitter"
-	"github.com/g-hyoga/kyuko/scrape"
 	"github.com/g-hyoga/kyuko/src/data"
+	"github.com/g-hyoga/kyuko/src/scrape"
 )
 
 func Exec(place int, client *goTwitter.Client) ([]data.KyukoData, error) {
