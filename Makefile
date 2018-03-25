@@ -1,12 +1,15 @@
 binary-name=kyukoHandler
 lambda-name=kyuko
+docker-image=kyuko-image
 
-build: clean
-	docker build -t kyuko-image .
+image-build:
+	docker build -t $(docker-image) .
+
+build: clean image-build
 	docker run -v $(PWD)/bin:/go/src/github.com/g-hyoga/kyuko/bin kyuko-image 
 	if [ ! -d output ]; then \
-		mkdir output; \
-	fi
+	  mkdir output; \
+  fi
 	cd bin && zip ../output/handler.zip $(binary-name)
 
 local-build: clean
@@ -20,6 +23,14 @@ clean:
 	rm -rf bin
 	rm -rf output
 
+# not working
+test: 
+	docker run $(docker-image) go test -v test ./...
+
+local-test:
+	go test -v ./...
+
+# not working
 deploy:
 	aws cloudformation package \
 		--template-file ./template.yml \
