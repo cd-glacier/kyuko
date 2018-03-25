@@ -6,10 +6,13 @@
 [田辺twitter](https://twitter.com/kyuko_tanabe)
 
 
-Ruby -> Golang
+Ruby -> Golang -> Golang on AWS Lambda
 
 [ここ](http://duet.doshisha.ac.jp/kyuko/i/)
 から休講情報をスクレイピングしてきて
 twitterになげています
+
+
+
 
 

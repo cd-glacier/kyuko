@@ -11,7 +11,7 @@ import (
 	"golang.org/x/text/unicode/norm"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/g-hyoga/kyuko/src/model"
+	"github.com/g-hyoga/kyuko/src/data"
 )
 
 var stringCleaner *strings.Replacer
@@ -166,8 +166,8 @@ func ConvertWeekStoi(weekday string) (int, error) {
 }
 
 //休講structのsliceを返す
-func Scrape(doc *goquery.Document, place int) ([]model.KyukoData, error) {
-	var kyukoData []model.KyukoData
+func Scrape(doc *goquery.Document, place int) ([]data.KyukoData, error) {
+	var kyukoData []data.KyukoData
 	var err error
 
 	var periods []int
@@ -190,7 +190,7 @@ func Scrape(doc *goquery.Document, place int) ([]model.KyukoData, error) {
 	}
 
 	for i := range periods {
-		k := model.KyukoData{}
+		k := data.KyukoData{}
 		k.Period = periods[i]
 		k.Reason = reasons[i]
 		k.ClassName = names[i]

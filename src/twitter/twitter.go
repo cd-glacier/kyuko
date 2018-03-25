@@ -7,20 +7,28 @@ import (
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
-	"github.com/g-hyoga/kyuko/src/model"
+	"github.com/g-hyoga/kyuko/src/data"
 )
 
 // newTwitterClient returns a new Twitter Client
-func NewTwitterClient(consumerKey, consumerSecret, token, tokenSecret string) *twitter.Client {
+func NewTwitterClient(consumerKey, consumerSecret, token, tokenSecret string) (*twitter.Client, error) {
+	if consumerKey == "" || consumerSecret == "" {
+		return nil, errors.New("consumerKey or consumerSecret is missing")
+	}
+
+	if token == "" || tokenSecret == "" {
+		return nil, errors.New("access token or access tokenSecret is missing")
+	}
+
 	config := oauth1.NewConfig(consumerKey, consumerSecret)
 	oauthToken := oauth1.NewToken(token, tokenSecret)
 	httpClient := config.Client(oauth1.NoContext, oauthToken)
-	return twitter.NewClient(httpClient)
+	return twitter.NewClient(httpClient), nil
 }
 
 // create line of template
 // period:className(Instructor)
-func CreateLine(kyuko model.KyukoData) (string, error) {
+func CreateLine(kyuko data.KyukoData) (string, error) {
 	if kyuko.ClassName == "" || kyuko.Instructor == "" || kyuko.Period == 0 {
 		return "", errors.New("休講情報がないです")
 	}
@@ -51,7 +59,7 @@ func ConvertWeekItos(weekday int) (string, error) {
 // ...
 //
 // in 140 characters
-func CreateContent(kyuko []model.KyukoData) ([]string, error) {
+func CreateContent(kyuko []data.KyukoData) ([]string, error) {
 	var tws []string
 
 	// create lines

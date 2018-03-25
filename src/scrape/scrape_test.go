@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/g-hyoga/kyuko/src/model"
+	"github.com/g-hyoga/kyuko/src/data"
 )
 
 var kyukoDoc, noKyukoDoc *goquery.Document
@@ -15,10 +15,10 @@ var testPeriods []int
 var testReasons, testNames, testInstructors []string
 var testPlace, testWeekday int
 var testDay string
-var testData []model.KyukoData
+var testData []data.KyukoData
 var noTestPlace, noTestWeekday int
 var noTestDay string
-var noTestData []model.KyukoData
+var noTestData []data.KyukoData
 
 const (
 	KYUKOFILE   = "../testdata/new_kyuko.html"
@@ -40,7 +40,7 @@ func init() {
 	testWeekday = 5
 
 	for i := range testPeriods {
-		k := model.KyukoData{}
+		k := data.KyukoData{}
 		k.Period = testPeriods[i]
 		k.Reason = testReasons[i]
 		k.ClassName = testNames[i]
