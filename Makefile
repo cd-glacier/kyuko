@@ -1,23 +1,27 @@
 binary-name=kyukoHandler
 lambda-name=kyuko
 docker-image=kyuko-image
+output=$(PWD)/output
+zip-name=handler.zip
+
+init: image-build
 
 image-build:
 	docker build -t $(docker-image) .
 
-build: clean image-build
+build: clean
 	docker run -v $(PWD)/bin:/go/src/github.com/g-hyoga/kyuko/bin kyuko-image 
 	if [ ! -d output ]; then \
 	  mkdir output; \
   fi
-	cd bin && zip ../output/handler.zip $(binary-name)
+	cd bin && zip $(output)/$(zip-name) $(binary-name)
 
 local-build: clean
 	GOOS=linux GOARCH=amd64 go build -o ./bin/$(binary-name) src/cmd/main.go 
 	if [ ! -d output ]; then \
 		mkdir output; \
 	fi
-	cd bin && zip ../output/handler.zip $(binary-name)
+	cd bin && zip $(output)/$(zip-name) $(binary-name)
 
 clean:
 	rm -rf bin
@@ -30,14 +34,13 @@ test:
 local-test:
 	go test -v ./...
 
-# not working
 deploy:
-	aws cloudformation package \
-		--template-file ./template.yml \
-		--output-template-file output/output-template.yml \
-		--s3-bucket kyuko-package
-	aws cloudformation deploy \
-		--template-file ./output/output-template.yml \
-		--stack-name new-stack-name
+	aws lambda update-function-code \
+		--function-name $(lambda-name) \
+		--zip-file fileb://$(output)/$(zip-name)
 
+invoke:
+	aws lambda invoke \
+		--function-name $(lambda-name) \
+		$(output)/output.json
 

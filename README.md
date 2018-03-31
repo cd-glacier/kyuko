@@ -50,7 +50,14 @@ make local-test
 
 # Deploy
 
-not working...
+## Required
+
+ * aws cli tool
+ * its credential
+
+```sh
+make deploy
+```
 
 # Structure
 
