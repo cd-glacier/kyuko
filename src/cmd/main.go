@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"log"
 	"os"
 
 	"github.com/aws/aws-lambda-go/lambda"
@@ -35,26 +37,32 @@ func kyukoHandler(ctx context.Context) (data.Response, error) {
 	// Imadegawa
 	iClient, err := twitter.NewTwitterClient(I_CONSUMER_KEY, I_CONSUMER_SECRET, I_ACCESS_TOKEN, I_ACCESS_TOKEN_SECRET)
 	if err != nil {
-		return data.Response{Data: kyukoData, Error: err}, err
-	}
-
-	kyukoData, err = kyuko.Exec(1, iClient, s3)
-	if err != nil {
-		return data.Response{Data: kyukoData, Error: err}, err
+		log.Println("Failed to create twitter Imadegawa client: ", err.Error())
+	} else {
+		kyukoData, err = kyuko.Exec(1, iClient, s3)
+		if err != nil {
+			log.Println("Failed to tweet about Imadegawa: ", err.Error())
+		} else {
+			b, _ := json.Marshal(kyukoData)
+			log.Println("SUCCESS Imadegawa: %s", string(b))
+		}
 	}
 
 	// Kyoutanabe
 	tClient, err := twitter.NewTwitterClient(T_CONSUMER_KEY, T_CONSUMER_SECRET, T_ACCESS_TOKEN, T_ACCESS_TOKEN_SECRET)
 	if err != nil {
-		return data.Response{Data: kyukoData, Error: err}, err
+		log.Println("Failed to create twitter Tanabe client: ", err.Error())
+	} else {
+		kyukoData, err = kyuko.Exec(2, tClient, s3)
+		if err != nil {
+			log.Println("Failed to tweet about Tanabe: ", err.Error())
+		} else {
+			b, _ := json.Marshal(kyukoData)
+			log.Println("SUCCESS tanabe: ", string(b))
+		}
 	}
 
-	kyukoData, err = kyuko.Exec(2, tClient, s3)
-	if err != nil {
-		return data.Response{Data: kyukoData, Error: err}, err
-	}
-
-	return data.Response{Data: kyukoData, Error: nil}, nil
+	return data.Response{Data: kyukoData, Error: err}, nil
 }
 
 func main() {

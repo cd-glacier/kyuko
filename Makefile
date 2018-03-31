@@ -43,4 +43,5 @@ invoke:
 	aws lambda invoke \
 		--function-name $(lambda-name) \
 		$(output)/output.json
+	cat $(output)/output.json
 

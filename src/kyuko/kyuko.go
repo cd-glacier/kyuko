@@ -2,7 +2,7 @@ package kyuko
 
 import (
 	"errors"
-	"fmt"
+	"log"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -25,9 +25,11 @@ func Exec(place int, client *goTwitter.Client, s3 s3.S3) ([]data.KyukoData, erro
 	}
 
 	kyukoData, err = scraper(doc, place)
-	if err != nil || len(kyukoData) <= 0 {
-		fmt.Println("KyukoData is 0 or scrape err")
+	if err != nil {
 		return kyukoData, err
+	}
+	if len(kyukoData) <= 0 {
+		return kyukoData, errors.New("KyukoData is 0")
 	}
 
 	_, err = s3.Put(time.Now().String()+".json", kyukoData)
@@ -98,14 +100,12 @@ func tweet(kyukoData []data.KyukoData, client *goTwitter.Client) error {
 	}
 
 	for _, tw := range tws {
-		fmt.Println("Tweet")
-		fmt.Println(tw)
-		/*
-			err := twitter.Update(client, tw)
-			if err != nil {
-				return err
-			}
-		*/
+		log.Println("Tweet")
+		log.Println(tw)
+		err := twitter.Update(client, tw)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
