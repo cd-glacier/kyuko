@@ -2,6 +2,8 @@ package twitter
 
 import (
 	"errors"
+	"log"
+	"os"
 	"strconv"
 	"unicode/utf8"
 
@@ -100,9 +102,15 @@ func CreateContent(kyuko []data.KyukoData) ([]string, error) {
 
 // tweet argment
 func Update(client *twitter.Client, text string) error {
-	_, _, err := client.Statuses.Update(text, nil)
-	if err != nil {
-		return err
+	if os.Getenv("KYUKO") == "PRODUCTION" {
+		log.Println("tweet: ", text)
+		_, _, err := client.Statuses.Update(text, nil)
+		if err != nil {
+			return err
+		}
+	} else {
+		log.Println("tweet: ", text)
 	}
+
 	return nil
 }
